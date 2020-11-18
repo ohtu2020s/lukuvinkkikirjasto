@@ -103,11 +103,23 @@ public abstract class Suggestion {
     this.identifier = id;
   }
 
+  /**
+   * Calls the appropriate methods for each field of this suggestion instance.
+   *
+   * Designed to be overridden by subclasses.
+   *
+   * @param visitor Visitor, whose methods are called for each field.
+   */
   public void visit(SuggestionVisitor visitor) {
     visitor.visitString("title", getTitle());
     visitor.visitString("author", getAuthor());
   }
 
+  /**
+   * Populates the instance with data from a {@link SuggestionDataProvider}.
+   *
+   * @param dataProvider Source from which values for the fields are retrieved.
+   */
   public void populate(SuggestionDataProvider dataProvider) {
     dataProvider
       .getString("title")
@@ -118,6 +130,16 @@ public abstract class Suggestion {
       .ifPresent(author -> setAuthor(author));
   }
 
+  /**
+   * Creates a new suggestion instance.
+   *
+   * @param kind Kind of the suggestion. An instance of the correct
+   *    subclass is created based on this value.
+   * @param dataProvider Instance is populated with data from this source.
+   *    Provide a {@code null} value if you want to create a bare instance.
+   *
+   * @see #populate(SuggestionDataProvider)
+   */
   static Suggestion create(String kind, SuggestionDataProvider dataProvider) {
     Suggestion suggestion = null;
 
@@ -125,7 +147,7 @@ public abstract class Suggestion {
       suggestion = new BookSuggestion();
     }
 
-    if (suggestion != null) {
+    if (suggestion != null && dataProvider != null) {
       suggestion.populate(dataProvider);
     }
 

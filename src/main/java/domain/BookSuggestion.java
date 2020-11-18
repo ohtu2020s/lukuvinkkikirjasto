@@ -36,12 +36,14 @@ public class BookSuggestion extends Suggestion {
     this.isbn = isbn;
   }
 
+  /** {@inheritDoc} */
   @Override
   public void visit(SuggestionVisitor visitor) {
     super.visit(visitor);
     visitor.visitString("isbn", isbn);
   }
 
+  /** {@inheritDoc} */
   @Override
   public void populate(SuggestionDataProvider dataProvider) {
     super.populate(dataProvider);
