@@ -4,6 +4,8 @@ package ohtu.domain;
  * Class
  */
 public class BookSuggestion extends Suggestion {
+  public static String KIND = "BOOK";
+
   /**
    * International Standard Book Number of the suggested book.
    *
