@@ -41,4 +41,13 @@ public class BookSuggestion extends Suggestion {
     super.visit(visitor);
     visitor.visitString("isbn", isbn);
   }
+
+  @Override
+  public void populate(SuggestionDataProvider dataProvider) {
+    super.populate(dataProvider);
+
+    dataProvider
+      .getString("isbn")
+      .ifPresent(isbn -> setIsbn(isbn));
+  }
 }

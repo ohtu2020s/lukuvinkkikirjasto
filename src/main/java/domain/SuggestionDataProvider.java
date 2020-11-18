@@ -1,5 +1,7 @@
 package ohtu.domain;
 
+import java.util.Optional;
+
 public interface SuggestionDataProvider {
-  String getString(String name) throws IllegalArgumentException;
+  Optional<String> getString(String name);
 }

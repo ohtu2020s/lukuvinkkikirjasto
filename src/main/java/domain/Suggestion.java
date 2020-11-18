@@ -104,7 +104,31 @@ public abstract class Suggestion {
   }
 
   public void visit(SuggestionVisitor visitor) {
-    visitor.visitString("title", title);
-    visitor.visitString("author", author);
+    visitor.visitString("title", getTitle());
+    visitor.visitString("author", getAuthor());
+  }
+
+  public void populate(SuggestionDataProvider dataProvider) {
+    dataProvider
+      .getString("title")
+      .ifPresent(title -> setTitle(title));
+
+    dataProvider
+      .getString("author")
+      .ifPresent(author -> setAuthor(author));
+  }
+
+  static Suggestion create(String kind, SuggestionDataProvider dataProvider) {
+    Suggestion suggestion = null;
+
+    if (kind.equals(BookSuggestion.KIND)) {
+      suggestion = new BookSuggestion();
+    }
+
+    if (suggestion != null) {
+      suggestion.populate(dataProvider);
+    }
+
+    return suggestion;
   }
 }

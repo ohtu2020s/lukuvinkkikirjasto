@@ -22,4 +22,30 @@ public class SuggestionTest {
       }
     });
   }
+
+  @Nested
+  class CreationTests {
+    MockDataProvider mock;
+
+    @BeforeEach
+    void initializeMock() {
+      mock = new MockDataProvider();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "BOOK" })
+    void suggestionTitleIsSetCorrectly(String kind) {
+      mock.setString("title", "Farenheit 451");
+      Suggestion sugg = Suggestion.create(kind, mock);
+      assertEquals(sugg.getTitle(), "Farenheit 451");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "BOOK" })
+    void suggestionAuthorIsSetCorrectly(String kind) {
+      mock.setString("author", "Ray Bradbury");
+      Suggestion sugg = Suggestion.create(kind, mock);
+      assertEquals(sugg.getAuthor(), "Ray Bradbury");
+    }
+  }
 }

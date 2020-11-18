@@ -1,6 +1,7 @@
 package ohtu.domain;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class MockDataProvider implements SuggestionDataProvider {
   private HashMap<String, String> stringValues = new HashMap<>();
@@ -9,12 +10,7 @@ public class MockDataProvider implements SuggestionDataProvider {
     stringValues.put(name, value);
   }
 
-  public String getString(String name) throws IllegalArgumentException {
-    String value = stringValues.get(name);
-
-    if (value == null)
-      return "";
-
-    return value;
+  public Optional<String> getString(String name) throws IllegalArgumentException {
+    return Optional.ofNullable(stringValues.get(name));
   }
 }
