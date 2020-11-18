@@ -13,3 +13,4 @@ Vaatimus on
 * Testaus automatisoitu
 * Integroitu muuhun ohjelmistoon
 * Dokumentoitu
+   
