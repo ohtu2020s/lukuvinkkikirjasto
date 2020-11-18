@@ -102,4 +102,9 @@ public abstract class Suggestion {
   public void setId(int id) {
     this.identifier = id;
   }
+
+  public void visit(SuggestionVisitor visitor) {
+    visitor.visitString("title", title);
+    visitor.visitString("author", author);
+  }
 }

@@ -35,4 +35,10 @@ public class BookSuggestion extends Suggestion {
   public void setIsbn(String isbn) {
     this.isbn = isbn;
   }
+
+  @Override
+  public void visit(SuggestionVisitor visitor) {
+    super.visit(visitor);
+    visitor.visitString("isbn", isbn);
+  }
 }
