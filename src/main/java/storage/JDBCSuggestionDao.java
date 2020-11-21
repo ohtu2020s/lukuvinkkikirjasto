@@ -2,13 +2,32 @@ package ohtu.storage;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 
 import ohtu.domain.Suggestion;
+import ohtu.domain.SuggestionDataProvider;
 import ohtu.domain.SuggestionVisitor;
 
+/**
+ * Implementation of {@link SuggestionVisitor} that stores the fields' values
+ * as rows in the {@code suggestion_fields} table.
+ */
 class SuggestionFieldInsertor implements SuggestionVisitor {
+  /**
+   * Handle to the JDBC database connection.
+   */
   private Connection connection;
+
+  /**
+   * The suggestion that is going to be stored.
+   */
   private Suggestion suggestion;
 
   SuggestionFieldInsertor(Connection connection, Suggestion suggestion) {
@@ -45,22 +64,41 @@ public class JDBCSuggestionDao implements SuggestionDao {
 
   @Override
   public void setup() {
-    try {
-      connection
-        .createStatement()
-        .execute(
-          "CREATE TABLE IF NOT EXISTS suggestion_fields (" +
-          "  suggestion_id INTEGER NOT NULL," +
-          "  field_name TEXT NOT NULL," +
-          "  field_value TEXT NOT NULL" +
-          ")"
-        );
+    try (Statement stmt = connection.createStatement()) {
+      stmt.execute(
+        "CREATE TABLE IF NOT EXISTS suggestion_fields (" +
+        "  suggestion_id INTEGER NOT NULL," +
+        "  field_name TEXT NOT NULL," +
+        "  field_value TEXT NOT NULL" +
+        ")"
+      );
+
+      stmt.execute(
+        "CREATE TABLE IF NOT EXISTS suggestions (" +
+        "  suggestion_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+        "  kind TEXT NOT NULL" +
+        ")"
+      );
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
   }
 
   public void saveSuggestion(Suggestion suggestion) {
+    try {
+      PreparedStatement stmt = connection
+        .prepareStatement("INSERT INTO suggestions (kind) VALUES (?)");
+
+      stmt.setString(1, suggestion.getKind());
+
+      stmt.execute();
+
+      suggestion.setId(stmt.getGeneratedKeys().getInt(1));
+    } catch (SQLException sqle) {
+
+      sqle.printStackTrace();
+    }
+
     suggestion.visit(new SuggestionFieldInsertor(connection, suggestion));
   }
 }
