@@ -14,6 +14,10 @@ public class BookSuggestion extends Suggestion {
    */
   private String isbn;
 
+  public String getKind() {
+    return KIND;
+  }
+
   /**
    * Gets the ISBN.
    *

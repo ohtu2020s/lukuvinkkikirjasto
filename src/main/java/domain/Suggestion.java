@@ -153,4 +153,6 @@ public abstract class Suggestion {
 
     return suggestion;
   }
+
+  abstract public String getKind();
 }
