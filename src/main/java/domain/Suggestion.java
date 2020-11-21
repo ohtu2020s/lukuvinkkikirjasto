@@ -140,7 +140,7 @@ public abstract class Suggestion {
    *
    * @see #populate(SuggestionDataProvider)
    */
-  static Suggestion create(String kind, SuggestionDataProvider dataProvider) {
+  public static Suggestion create(String kind, SuggestionDataProvider dataProvider) {
     Suggestion suggestion = null;
 
     if (kind.equals(BookSuggestion.KIND)) {
