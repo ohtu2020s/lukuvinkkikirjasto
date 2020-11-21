@@ -55,6 +55,42 @@ class SuggestionFieldInsertor implements SuggestionVisitor {
   }
 }
 
+/**
+ * Data provider for temporarily storing the serialized field values in memory.
+ */
+class StringDataProvider implements SuggestionDataProvider {
+  /**
+   * Map from field names to serialized field values.
+   */
+  private HashMap<String, String> fields = new HashMap<>();
+
+  /**
+   * Clears the stored fields, returning the instance to it's initial state.
+   */
+  public void clear() {
+    fields.clear();
+  }
+
+  /**
+   * Stores a field's serialized value in the internal buffer.
+   *
+   * @param name Field's name
+   * @param value Field's value, in serialized form.
+   */
+  public void setField(String name, String value) {
+    fields.put(name, value);
+  }
+
+  /**
+   * Gets a field's value as a string.
+   *
+   * If no value for the specified field is stored, returns an empty optional.
+   */
+  public Optional<String> getString(String name) {
+    return Optional.ofNullable(fields.get(name));
+  }
+}
+
 public class JDBCSuggestionDao implements SuggestionDao {
   private Connection connection;
 
@@ -100,5 +136,48 @@ public class JDBCSuggestionDao implements SuggestionDao {
     }
 
     suggestion.visit(new SuggestionFieldInsertor(connection, suggestion));
+  }
+
+  /**
+   * Gets a list of all suggestions from the database and populates them.
+   */
+  public List<Suggestion> getSuggestions() {
+    ArrayList<Suggestion> suggestions = new ArrayList<>();
+
+    try {
+      ResultSet rows = connection
+        .createStatement()
+        .executeQuery(
+          "SELECT suggestions.suggestion_id, kind, field_name, field_value " +
+          "FROM suggestions " +
+          "LEFT JOIN suggestion_fields " +
+          "  ON suggestions.suggestion_id = suggestion_fields.suggestion_id"
+        );
+
+      Integer id = null;
+      String kind = null;
+      StringDataProvider data = new StringDataProvider();
+
+      while (rows.next()) {
+        Integer new_id = rows.getInt("suggestion_id");
+        String new_kind = rows.getString("kind");
+
+        // This branch is executed whenever a suggestion's
+        // all fields have been ingested into `data`.
+        if (id != new_id && id != null) {
+          suggestions.add(Suggestion.create(kind, data));
+          data.clear();
+        }
+
+        id = new_id;
+        kind = new_kind;
+
+        data.setField(rows.getString("field_name"), rows.getString("field_value"));
+      }
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+    }
+
+    return suggestions;
   }
 }

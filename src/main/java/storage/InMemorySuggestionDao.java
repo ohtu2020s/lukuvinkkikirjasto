@@ -74,4 +74,14 @@ public class InMemorySuggestionDao implements SuggestionDao {
 
     data.put(suggestion.getId(), Pair.with(suggestion.getKind(), collector));
   }
+
+  /**
+   * Gets a list of all stored Suggestions.
+   */
+  public List<Suggestion> getSuggestions() {
+    return data.values()
+      .stream()
+      .map(pair -> Suggestion.create(pair.getValue0(), pair.getValue1()))
+      .collect(Collectors.toList());
+  }
 }
