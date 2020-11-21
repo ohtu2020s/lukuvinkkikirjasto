@@ -15,7 +15,7 @@ public class BookSuggestionTest {
     final boolean[] isbnVisited = { false };
 
     sugg.visit(new SuggestionVisitor() {
-      void visitString(String name, String value) {
+      public void visitString(String name, String value) {
         if (name.equals("isbn")) {
           assertEquals(value, "isbn");
           isbnVisited[0] = true;

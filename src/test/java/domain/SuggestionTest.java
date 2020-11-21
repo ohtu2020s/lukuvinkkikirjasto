@@ -14,7 +14,7 @@ public class SuggestionTest {
     sugg.setAuthor("author");
 
     sugg.visit(new SuggestionVisitor() {
-      void visitString(String name, String value) {
+      public void visitString(String name, String value) {
         if (name.equals("title"))
           assertEquals(value, "title");
         else if (name.equals("author"))
