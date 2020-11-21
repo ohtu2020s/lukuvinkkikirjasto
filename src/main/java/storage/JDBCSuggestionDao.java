@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import ohtu.domain.Suggestion;
 import ohtu.domain.SuggestionVisitor;
 
-class SuggestionFieldInsertor extends SuggestionVisitor {
+class SuggestionFieldInsertor implements SuggestionVisitor {
   private Connection connection;
   private Suggestion suggestion;
 

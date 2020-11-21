@@ -5,9 +5,9 @@ package ohtu.domain;
  *
  * Designed to be subclassed. The default implementations for the methods do nothing.
  */
-public class SuggestionVisitor {
+public interface SuggestionVisitor {
   /**
    * Called for each field with type {@link String}.
    */
-  void visitString(String name, String value) {}
+  default void visitString(String name, String value) {}
 }
