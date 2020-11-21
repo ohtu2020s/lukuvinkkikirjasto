@@ -31,3 +31,7 @@ run {
 test {
   	useJUnitPlatform()
 }
+
+javadoc {
+  options.memberLevel = JavadocMemberLevel.PRIVATE
+}
