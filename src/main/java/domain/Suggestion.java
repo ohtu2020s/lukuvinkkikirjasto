@@ -138,6 +138,9 @@ public abstract class Suggestion {
    * @param dataProvider Instance is populated with data from this source.
    *    Provide a {@code null} value if you want to create a bare instance.
    *
+   * @return Instance of a subclass of {@link Suggestion} specified by the {@code kind}
+   *   parameter and populated with data from {@code dataProvider}.
+   *
    * @see #populate(SuggestionDataProvider)
    */
   public static Suggestion create(String kind, SuggestionDataProvider dataProvider) {

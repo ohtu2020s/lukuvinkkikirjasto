@@ -35,6 +35,14 @@ class SuggestionFieldInsertor implements SuggestionVisitor {
     this.suggestion = suggestion;
   }
 
+  /**
+   * Inserts a serialized field value into the database.
+   *
+   * @param field Field's name.
+   *   Corresponds directly to the {@code field_name} column in the {@code suggestion_fields} table.
+   * @param value Field's value in it's serialized form.
+   *   Corresponds directly to the {@code field_value} column in the {@code suggestion_fields} table.
+   */
   private void insertField(String field, String value) {
     String sql = "INSERT INTO suggestion_fields (suggestion_id, field_name, field_value) VALUES (?, ?, ?)";
 
@@ -49,6 +57,12 @@ class SuggestionFieldInsertor implements SuggestionVisitor {
     }
   }
 
+  /**
+   * Stores a field with a {@link String} value in the database.
+   *
+   * The database stores the values as strings, so no conversion
+   * is needed and the value can be stored as-is.
+   */
   @Override
   public void visitString(String name, String value) {
     insertField(name, value);
@@ -91,6 +105,81 @@ class StringDataProvider implements SuggestionDataProvider {
   }
 }
 
+/**
+ * {@link SuggestionDao} implementation which uses a relational database as it's backend.
+ *
+ * Most databases with JDBC drivers should work, but at least SQLite is quaranteed to work.
+ *
+ * <h2>Database Tables</h2>
+ *
+ * <h3><code>suggestions</code></h3>
+ *
+ * The {@code suggestions} table contains a single row for each stored {@link Suggestion}.
+ * The task of generating identifiers for the suggestions is offloaded to the database
+ * implementation, and this table's {@code suggestion_id} column is used to generate the
+ * identifiers.
+ *
+ * Note that this table contains only implementation-specific information -- all user
+ * provided data is stored in the {@code suggestion_fields} table.
+ *
+ * <blockquote>
+ * <table summary="Schema of the suggestions database table" cellspacing=3>
+ *   <tr style="background-color: #ccccff; font-family: sans-serif">
+ *     <th>Column Name</th>
+ *     <th>Column Type</th>
+ *     <th>Description</th>
+ *   </tr>
+ *   <tr>
+ *     <td>suggestion_id</td>
+ *     <td><code><b>INTEGER</b> PRIMARY KEY AUTOINCREMENT NOT NULL</code></td>
+ *     <td>Sequential numerical unique identifier of the suggestion.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>kind</td>
+ *     <td><code><b>TEXT</b> NOT NULL</code></td>
+ *     <td>
+ *       String denoting the kind of the suggestion.
+ *       See {@link Suggestion#create} for list of all known suggestion kinds.
+ *     </td>
+ *   </tr>
+ * </table>
+ * </blockquote>
+ *
+ * <h3><code>suggestion_fields</code></h3>
+ *
+ * This table stores the actual details of suggestions as key-value pairs.
+ * The values are converted to text before storing them. No metadata about
+ * the original type of the value is stored and so the retriever is given
+ * the responsibility of knowing how to interpret the values.
+ *
+ * <blockquote>
+ * <table summary="Schema of the suggestion_fields database table" cellspacing=3 style="vertical-align: top">
+ *   <tr style="background-color: #ccccff; font-family: sans-serif">
+ *     <th>Column Name</th>
+ *     <th>Column Type</th>
+ *     <th>Description</th>
+ *   </tr>
+ *   <tr>
+ *     <td>suggestion_id</td>
+ *     <td><code><b>INTEGER</b> NOT NULL</code></td>
+ *     <td>
+ *       Identifier of the {@link Suggestion} this field belongs to.
+ *       Foreign key reference to the {@code suggestion_id} field in the {@code suggestions} table.
+ *     </td>
+ *   </tr>
+ *   <tr>
+ *     <td>field_name</td>
+ *     <td><code><b>TEXT</b> NOT NULL</code></td>
+ *     <td>Textual (non-user-facing) name which is used to identify the field.</td>
+ *   </tr>
+ *   <tr>
+ *     <td>field_value</td>
+ *     <td><code><b>TEXT</b> NOT NULL</code></td>
+ *     <td>Value of the field, serialised into a string.</td>
+ *   </tr>
+ * </table>
+ * </blockquote>
+ */
 public class JDBCSuggestionDao implements SuggestionDao {
   private Connection connection;
 
@@ -98,6 +187,9 @@ public class JDBCSuggestionDao implements SuggestionDao {
     this.connection = connection;
   }
 
+  /**
+   * Creates the neccessary database tables at startup if neccessary.
+   */
   @Override
   public void setup() {
     try (Statement stmt = connection.createStatement()) {
@@ -120,6 +212,17 @@ public class JDBCSuggestionDao implements SuggestionDao {
     }
   }
 
+  /**
+   * Saves a new suggestion to the database.
+   *
+   * A new unique ID is generated for the suggestion during the operation.
+   * Inserts a single row into the {@code suggestions} table and inserts
+   * the suggestion's details as key-value pairs to the {@code suggestion_fields}
+   * table.
+   *
+   * @param suggestion The suggestion to be stored.
+   *   The referenced instance's ID is altered during this operation.
+   */
   public void saveSuggestion(Suggestion suggestion) {
     try {
       PreparedStatement stmt = connection
