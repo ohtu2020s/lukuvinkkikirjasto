@@ -3,20 +3,24 @@ plugins {
     id 'application'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
-
-sourceCompatibility = 1.8
-
 repositories {
     jcenter()
     mavenCentral()
 }
 
+project.ext {
+    cucumberVersion = '6.8.1'
+    junitVersion = '4.13'
+}
+
 dependencies {
     testImplementation(platform('org.junit:junit-bom:5.7.0'))
     testImplementation('org.junit.jupiter:junit-jupiter')
-
+    
+    testCompile 'io.cucumber:cucumber-java:' + cucumberVersion
+    testCompile 'io.cucumber:cucumber-junit:' + cucumberVersion
+    testCompile 'junit:junit:' + junitVersion
+    
     compile group: 'org.javatuples', name: 'javatuples', version: '1.2'
 }
 
@@ -24,14 +28,16 @@ application {
     mainClass = 'Main'
 }
 
+
+test {
+    testLogging.showStandardStreams = true
+    systemProperties System.getProperties()
+}
+
 run {
     standardInput = System.in
 }
 
-test {
-  	useJUnitPlatform()
-}
-
 javadoc {
-  options.memberLevel = JavadocMemberLevel.PRIVATE
+    options.memberLevel = JavadocMemberLevel.PRIVATE
 }

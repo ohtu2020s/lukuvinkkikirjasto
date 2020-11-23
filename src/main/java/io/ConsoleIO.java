@@ -1,6 +1,6 @@
-package ui;
+package io;
 
-import ui.IO;
+import io.IO;
 import java.util.Scanner;
 
 /**
@@ -21,6 +21,10 @@ public class ConsoleIO implements IO {
 
     public void print(String m) {
         System.out.println(m);
+    }
+    public String readLine(String prompt) {
+        System.out.println(prompt);
+        return lukija.nextLine();
     }
 
 }

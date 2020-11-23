@@ -1,12 +1,12 @@
 
-import ui.ConsoleIO;
-import ui.Ui;
+import io.ConsoleIO;
+import io.IO;
+import ui.textUI;
 
 public class Main {
 
     public static void main(String[] args) {
-        Ui kayttoliittyma = new Ui(new ConsoleIO());
+        textUI kayttoliittyma = new textUI(new ConsoleIO());
         kayttoliittyma.launch();
-
     }
 }
