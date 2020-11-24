@@ -1,7 +1,7 @@
+package ohtu;
 
-import io.ConsoleIO;
-import io.IO;
-import ui.textUI;
+import ohtu.io.ConsoleIO;
+import ohtu.ui.textUI;
 
 public class Main {
 

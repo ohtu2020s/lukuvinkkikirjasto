@@ -1,6 +1,5 @@
-package io;
+package ohtu.io;
 
-import io.IO;
 import java.util.Scanner;
 
 /**

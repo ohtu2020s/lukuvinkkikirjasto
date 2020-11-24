@@ -5,11 +5,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import java.util.ArrayList;
-import io.*;
 import java.util.List;
+
+import ohtu.io.StubIO;
 import ohtu.storage.InMemorySuggestionDao;
 import static org.junit.Assert.*;
-import ui.textUI;
+import ohtu.ui.textUI;
 
 public class Stepdefs {
 

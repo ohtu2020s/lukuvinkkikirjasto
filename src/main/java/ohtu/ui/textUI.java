@@ -1,6 +1,6 @@
-package ui;
+package ohtu.ui;
 
-import io.IO;
+import ohtu.io.IO;
 
 /**
  * User Interface
