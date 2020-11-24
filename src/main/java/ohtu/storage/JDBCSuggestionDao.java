@@ -185,6 +185,10 @@ public class JDBCSuggestionDao implements SuggestionDao {
 
   JDBCSuggestionDao(Connection connection) {
     this.connection = connection;
+
+    try {
+      this.connection.setAutoCommit(false);
+    } catch (SQLException sqle) {}
   }
 
   /**
@@ -207,6 +211,8 @@ public class JDBCSuggestionDao implements SuggestionDao {
         "  kind TEXT NOT NULL" +
         ")"
       );
+
+      connection.commit();
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -230,15 +236,16 @@ public class JDBCSuggestionDao implements SuggestionDao {
 
       stmt.setString(1, suggestion.getKind());
 
-      stmt.execute();
+      stmt.executeUpdate();
 
       suggestion.setId(stmt.getGeneratedKeys().getInt(1));
-    } catch (SQLException sqle) {
 
+      suggestion.visit(new SuggestionFieldInsertor(connection, suggestion));
+
+      connection.commit();
+    } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
-
-    suggestion.visit(new SuggestionFieldInsertor(connection, suggestion));
   }
 
   /**
@@ -261,15 +268,24 @@ public class JDBCSuggestionDao implements SuggestionDao {
       String kind = null;
       StringDataProvider data = new StringDataProvider();
 
-      while (rows.next()) {
-        Integer new_id = rows.getInt("suggestion_id");
-        String new_kind = rows.getString("kind");
+      while (true) {
+        Integer new_id = null;
+        String new_kind = null;
+
+        if (rows.next()) {
+          new_id = rows.getInt("suggestion_id");
+          new_kind = rows.getString("kind");
+        }
 
         // This branch is executed whenever a suggestion's
         // all fields have been ingested into `data`.
         if (id != new_id && id != null) {
           suggestions.add(Suggestion.create(kind, data));
           data.clear();
+        }
+
+        if (new_id == null) {
+          break;
         }
 
         id = new_id;

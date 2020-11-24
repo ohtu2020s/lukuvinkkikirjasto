@@ -42,6 +42,13 @@ class SuggestionFieldHashMap implements SuggestionVisitor, SuggestionDataProvide
 
     return Optional.empty();
   }
+
+  /**
+   * Stores the value of a String field in the internal collection.
+   */
+  public void visitString(String field, String value) {
+    fields.put(field, value);
+  }
 }
 
 /**
