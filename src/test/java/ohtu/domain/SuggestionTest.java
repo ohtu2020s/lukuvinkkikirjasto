@@ -36,7 +36,7 @@ public class SuggestionTest {
     @ValueSource(strings = { "BOOK" })
     void suggestionTitleIsSetCorrectly(String kind) {
       mock.setString("title", "Farenheit 451");
-      Suggestion sugg = Suggestion.create(kind, mock);
+      Suggestion sugg = SuggestionFactory.create(kind, mock);
       assertEquals(sugg.getTitle(), "Farenheit 451");
     }
 
@@ -44,7 +44,7 @@ public class SuggestionTest {
     @ValueSource(strings = { "BOOK" })
     void suggestionAuthorIsSetCorrectly(String kind) {
       mock.setString("author", "Ray Bradbury");
-      Suggestion sugg = Suggestion.create(kind, mock);
+      Suggestion sugg = SuggestionFactory.create(kind, mock);
       assertEquals(sugg.getAuthor(), "Ray Bradbury");
     }
   }

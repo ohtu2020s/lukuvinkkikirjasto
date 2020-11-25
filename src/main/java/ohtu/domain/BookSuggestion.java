@@ -3,6 +3,7 @@ package ohtu.domain;
 /**
  * Class
  */
+@SuggestionKind("BOOK")
 public class BookSuggestion extends Suggestion {
   public static String KIND = "BOOK";
 
@@ -12,6 +13,7 @@ public class BookSuggestion extends Suggestion {
    * @see #setIsbn
    * @see #getIsbn
    */
+  @SuggestionField(display = "ISBN")
   private String isbn;
 
   public String getKind() {
@@ -43,22 +45,5 @@ public class BookSuggestion extends Suggestion {
    */
   public void setIsbn(String isbn) {
     this.isbn = isbn;
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public void visit(SuggestionVisitor visitor) {
-    super.visit(visitor);
-    visitor.visitString("isbn", isbn);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public void populate(SuggestionDataProvider dataProvider) {
-    super.populate(dataProvider);
-
-    dataProvider
-      .getString("isbn")
-      .ifPresent(isbn -> setIsbn(isbn));
   }
 }

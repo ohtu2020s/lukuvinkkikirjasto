@@ -5,6 +5,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.lang.reflect.Field;
+import java.util.Set;
+import java.util.HashSet;
+import org.reflections.Reflections;
 
 /**
  * Abstract base class for different kinds of suggested content.
@@ -19,6 +23,7 @@ public abstract class Suggestion {
    * @see #setId
    * @see #getId
    */
+  @SuggestionField
   private int identifier;
 
   /**
@@ -27,6 +32,7 @@ public abstract class Suggestion {
    * @see #setTitle
    * @see #getTitle
    */
+  @SuggestionField
   private String title;
 
   /**
@@ -35,6 +41,7 @@ public abstract class Suggestion {
    * @see #setAuthor
    * @see #getAuthor
    */
+  @SuggestionField
   private String author;
 
   /**
@@ -111,8 +118,24 @@ public abstract class Suggestion {
    * @param visitor Visitor, whose methods are called for each field.
    */
   public void visit(SuggestionVisitor visitor) {
-    visitor.visitString("title", getTitle());
-    visitor.visitString("author", getAuthor());
+    Class<?> c = getClass();
+
+    while (!c.equals(Object.class)) {
+      Field[] fields = c.getDeclaredFields();
+
+      for (Field field : fields) {
+        field.setAccessible(true);
+
+        if (!field.isAnnotationPresent(SuggestionField.class)) {
+          continue;
+        }
+
+        SuggestionFieldValue<Object> value = SuggestionFieldValue.fromField(this, field);
+        visitor.visit(value);
+      }
+
+      c = c.getSuperclass();
+    }
   }
 
   /**
@@ -121,43 +144,27 @@ public abstract class Suggestion {
    * @param dataProvider Source from which values for the fields are retrieved.
    */
   public void populate(SuggestionDataProvider dataProvider) {
-    dataProvider
-      .getString("title")
-      .ifPresent(title -> setTitle(title));
-
-    dataProvider
-      .getString("author")
-      .ifPresent(author -> setAuthor(author));
+    visit(new SuggestionVisitor() {
+      @Override
+      public void visit(SuggestionFieldValue<?> field) {
+        field.populate(dataProvider);
+      }
+    });
   }
 
-  /**
-   * Creates a new suggestion instance.
-   *
-   * @param kind Kind of the suggestion. An instance of the correct
-   *    subclass is created based on this value.
-   * @param dataProvider Instance is populated with data from this source.
-   *    Provide a {@code null} value if you want to create a bare instance.
-   *
-   * @return Instance of a subclass of {@link Suggestion} specified by the {@code kind}
-   *   parameter and populated with data from {@code dataProvider}.
-   *
-   * @see #populate(SuggestionDataProvider)
-   */
-  public static Suggestion create(String kind, SuggestionDataProvider dataProvider) {
-    Suggestion suggestion = null;
+  public static String getKind(Class<? extends Suggestion> suggestionClass) {
+      SuggestionKind annotation = suggestionClass.getAnnotation(SuggestionKind.class);
 
-    if (kind.equals(BookSuggestion.KIND)) {
-      suggestion = new BookSuggestion();
-    }
+      if (annotation == null) {
+        return null;
+      }
 
-    if (suggestion != null && dataProvider != null) {
-      suggestion.populate(dataProvider);
-    }
+      return annotation.value();
+  } 
 
-    return suggestion;
+  public String getKind() {
+    return Suggestion.getKind(getClass());
   }
-
-  abstract public String getKind();
 
   abstract public String toString();
 }

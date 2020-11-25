@@ -15,9 +15,9 @@ public class BookSuggestionTest {
     final boolean[] isbnVisited = { false };
 
     sugg.visit(new SuggestionVisitor() {
-      public void visitString(String name, String value) {
-        if (name.equals("isbn")) {
-          assertEquals(value, "isbn");
+      public void visitString(SuggestionFieldValue<String> field) {
+        if (field.getName().equals("isbn")) {
+          assertEquals(field.getValue(), "isbn");
           isbnVisited[0] = true;
         }
       }
@@ -37,14 +37,14 @@ public class BookSuggestionTest {
 
     @Test
     void classOfTheBuiltInstanceMatchesTheKindWhenItsBook() {
-      Suggestion sugg = Suggestion.create(BookSuggestion.KIND, mock);
+      Suggestion sugg = SuggestionFactory.create(BookSuggestion.KIND, mock);
       assertTrue(sugg instanceof BookSuggestion);
     }
 
     @Test
     void bookSuggestionIsbnIsSetCorrectly() {
       mock.setString("isbn", "978-1451673319");
-      BookSuggestion sugg = (BookSuggestion) Suggestion.create(BookSuggestion.KIND, mock);
+      BookSuggestion sugg = (BookSuggestion) SuggestionFactory.create(BookSuggestion.KIND, mock);
       assertEquals(sugg.getIsbn(), "978-1451673319");
     }
   }

@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import ohtu.domain.Suggestion;
+import ohtu.domain.SuggestionFactory;
+import ohtu.domain.SuggestionFieldValue;
 import ohtu.domain.SuggestionDataProvider;
 import ohtu.domain.SuggestionVisitor;
 
@@ -64,8 +66,8 @@ class SuggestionFieldInsertor implements SuggestionVisitor {
    * is needed and the value can be stored as-is.
    */
   @Override
-  public void visitString(String name, String value) {
-    insertField(name, value);
+  public void visitString(SuggestionFieldValue<String> field) {
+    insertField(field.getName(), field.getValue());
   }
 }
 
@@ -281,7 +283,8 @@ public class JDBCSuggestionDao implements SuggestionDao {
         // This branch is executed whenever a suggestion's
         // all fields have been ingested into `data`.
         if (id != new_id && id != null) {
-          suggestions.add(Suggestion.create(kind, data));
+          Suggestion instance = SuggestionFactory.create(kind, data);
+          suggestions.add(instance);
           data.clear();
         }
 

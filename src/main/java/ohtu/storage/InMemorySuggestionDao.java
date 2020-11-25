@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import org.javatuples.Pair;
 
 import ohtu.domain.Suggestion;
+import ohtu.domain.SuggestionFactory;
+import ohtu.domain.SuggestionFieldValue;
 import ohtu.domain.SuggestionDataProvider;
 import ohtu.domain.SuggestionVisitor;
 
@@ -46,8 +48,9 @@ class SuggestionFieldHashMap implements SuggestionVisitor, SuggestionDataProvide
   /**
    * Stores the value of a String field in the internal collection.
    */
-  public void visitString(String field, String value) {
-    fields.put(field, value);
+  @Override
+  public void visitString(SuggestionFieldValue<String> field) {
+    fields.put(field.getName(), field.getValue());
   }
 }
 
@@ -88,7 +91,7 @@ public class InMemorySuggestionDao implements SuggestionDao {
   public List<Suggestion> getSuggestions() {
     return data.values()
       .stream()
-      .map(pair -> Suggestion.create(pair.getValue0(), pair.getValue1()))
+      .map(pair -> SuggestionFactory.create(pair.getValue0(), pair.getValue1()))
       .collect(Collectors.toList());
   }
 }

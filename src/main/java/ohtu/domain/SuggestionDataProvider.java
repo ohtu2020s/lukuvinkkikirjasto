@@ -14,5 +14,11 @@ public interface SuggestionDataProvider {
    * @return Value of the field, or empty optional if no such field exists
    *    or it's value cannot be converted into a {@link String}.
    */
-  Optional<String> getString(String name);
+  default Optional<String> getString(String name) {
+      return Optional.empty();
+  }
+
+  default Optional<Integer> getInteger(String name) {
+      return Optional.empty();
+  }
 }
