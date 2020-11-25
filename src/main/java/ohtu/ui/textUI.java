@@ -1,5 +1,7 @@
 package ohtu.ui;
 
+import ohtu.Main;
+import ohtu.domain.BookSuggestion;
 import ohtu.io.IO;
 
 /**
@@ -40,7 +42,11 @@ public class textUI {
                         String author = io.nextString();
                         io.print("ISBN:");
                         String ISBN = io.nextString();
-                        //kirjan tallennus 
+                        BookSuggestion suggestion = new BookSuggestion();
+                        suggestion.setIsbn(ISBN);
+                        suggestion.setAuthor(author);
+                        suggestion.setTitle(title);
+                        Main.saveSuggestion(suggestion);
                         continue;
                     }
 

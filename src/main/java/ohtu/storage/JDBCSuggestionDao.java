@@ -183,12 +183,13 @@ class StringDataProvider implements SuggestionDataProvider {
 public class JDBCSuggestionDao implements SuggestionDao {
   private Connection connection;
 
-  JDBCSuggestionDao(Connection connection) {
+  public JDBCSuggestionDao(Connection connection) {
     this.connection = connection;
 
     try {
       this.connection.setAutoCommit(false);
     } catch (SQLException sqle) {}
+    this.setup();
   }
 
   /**
