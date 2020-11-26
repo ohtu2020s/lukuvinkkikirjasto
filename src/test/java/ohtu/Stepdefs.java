@@ -31,7 +31,7 @@ public class Stepdefs {
         inputLines.add("new");
 
         io = new StubIO(inputLines);
-        textUI kayttoliittyma = new textUI(io);
+        textUI kayttoliittyma = new textUI(io, memoryDao);
         kayttoliittyma.launch();
     }
     
