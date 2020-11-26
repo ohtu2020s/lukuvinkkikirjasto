@@ -18,6 +18,11 @@ public class BookSuggestion extends Suggestion {
     return KIND;
   }
 
+  @Override
+  public String toString() {
+    return String.join(", ", super.getTitle(), KIND.toLowerCase(), super.getAuthor());
+  }
+
   /**
    * Gets the ISBN.
    *

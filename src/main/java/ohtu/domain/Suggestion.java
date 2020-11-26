@@ -158,4 +158,6 @@ public abstract class Suggestion {
   }
 
   abstract public String getKind();
+
+  abstract public String toString();
 }

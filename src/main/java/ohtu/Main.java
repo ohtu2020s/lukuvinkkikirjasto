@@ -1,6 +1,5 @@
 package ohtu;
 
-import ohtu.domain.Suggestion;
 import ohtu.io.ConsoleIO;
 import ohtu.storage.JDBCSuggestionDao;
 import ohtu.ui.textUI;
@@ -22,11 +21,7 @@ public class Main {
         }
         dao = new JDBCSuggestionDao(connection);
 
-        textUI kayttoliittyma = new textUI(new ConsoleIO());
+        textUI kayttoliittyma = new textUI(new ConsoleIO(), dao);
         kayttoliittyma.launch();
-    }
-
-    public static void saveSuggestion(Suggestion suggestion) {
-        dao.saveSuggestion(suggestion);
     }
 }

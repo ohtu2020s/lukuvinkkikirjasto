@@ -2,7 +2,9 @@ package ohtu.ui;
 
 import ohtu.Main;
 import ohtu.domain.BookSuggestion;
+import ohtu.domain.Suggestion;
 import ohtu.io.IO;
+import ohtu.storage.SuggestionDao;
 
 /**
  * User Interface
@@ -11,9 +13,11 @@ import ohtu.io.IO;
 public class textUI {
 
     private final IO io;
+    private final SuggestionDao dao;
 
-    public textUI(IO io) {
+    public textUI(IO io, SuggestionDao dao) {
         this.io = io;
+        this.dao = dao;
     }
 
     public void launch() {
@@ -46,11 +50,14 @@ public class textUI {
                         suggestion.setIsbn(ISBN);
                         suggestion.setAuthor(author);
                         suggestion.setTitle(title);
-                        Main.saveSuggestion(suggestion);
+                        dao.saveSuggestion(suggestion);
                         continue;
                     }
 
                 case "show":
+                    for (Suggestion item : dao.getSuggestions()) {
+                        System.out.println(item.toString());
+                    }
 
                     continue;
                 case "quit":
