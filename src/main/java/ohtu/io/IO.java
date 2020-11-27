@@ -8,12 +8,14 @@ public interface IO {
     void print(String m);
     String nextString();
 
-    default String prompt(String prompt) {
-        print(prompt);
-        return nextString();
-    }
+    String prompt(String prompt);
+    String prompt(String prompt, String defaultValue);
 
     default void println(String line) {
         print(line + "\n");
+    }
+
+    default void println() {
+        print("\n");
     }
 }

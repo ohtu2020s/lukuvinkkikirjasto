@@ -25,6 +25,7 @@ dependencies {
     compile group: 'org.javatuples', name: 'javatuples', version: '1.2'
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.32.3.2'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
+    compile group: 'org.jline', name: 'jline', version: '3.17.1'
 }
 
 application {
@@ -48,4 +49,14 @@ run {
 
 javadoc {
     options.memberLevel = JavadocMemberLevel.PRIVATE
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'ohtu.Main'
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }

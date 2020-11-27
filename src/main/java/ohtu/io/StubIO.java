@@ -34,7 +34,7 @@ public class StubIO implements IO {
         return "";
     }
 
-    public String readLine(String prompt) {
+    public String prompt(String prompt) {
         print(prompt);
         if (i < lines.size()) {
             return lines.get(i++);
@@ -42,4 +42,7 @@ public class StubIO implements IO {
         return "";
     }
 
+    public String prompt(String prompt, String defaultValue) {
+        return prompt(prompt);
+    }
 }
