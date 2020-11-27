@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import ohtu.io.IO;
 import ohtu.storage.SuggestionDao;
+import ohtu.domain.SuggestionVisitor;
+import ohtu.domain.SuggestionFieldValue;
 
 class Command {
     String name;
@@ -40,6 +42,7 @@ public class TextUI {
         this.dao = dao;
 
         addCommand("new", "create a new suggestion", this::commandNew);
+        addCommand("edit", "edit an existing suggestion", this::commandEdit);
         addCommand("show", "show saved suggestions", this::commandShow);
         addCommand("quit", "quit the program", this::commandQuit);
     }
@@ -96,6 +99,36 @@ outer:
         for (Suggestion item : dao.getSuggestions()) {
             System.out.println(item.toString());
         }
+    }
+
+    private void commandEdit() {
+        for (Suggestion item : dao.getSuggestions()) {
+            io.println(String.format("%3s [%s] %s", item.getId() + ":", item.getKind(), item.getTitle()));
+        }
+
+        io.println();
+        String input = io.prompt(
+            "Select an item from the above list to edit by typing in it's ID: "
+        );
+
+        Integer id = Integer.valueOf(input);
+
+        if (id == null) {
+            io.println("Invalid ID: " + input);
+            return;
+        }
+
+        Suggestion suggestion = dao.getSuggestionById(id);
+
+        suggestion.visit(new SuggestionVisitor() {
+            @Override
+            public void visitString(SuggestionFieldValue<String> field) {
+                String newValue = io.prompt("  " + field.getDisplayName() + ": ", field.getValue());
+                field.setValue(newValue);
+            }
+        });
+
+        dao.updateSuggestion(suggestion);
     }
 
     private void commandQuit() {
