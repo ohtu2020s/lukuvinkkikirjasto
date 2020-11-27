@@ -94,4 +94,14 @@ public class InMemorySuggestionDao implements SuggestionDao {
       .map(pair -> SuggestionFactory.create(pair.getValue0(), pair.getValue1()))
       .collect(Collectors.toList());
   }
+
+  public Suggestion getSuggestionById(int id) {
+    Pair<String, SuggestionFieldHashMap> pair = data.get(id);
+
+    if (pair == null) {
+      return null;
+    }
+
+    return SuggestionFactory.create(pair.getValue0(), pair.getValue1());
+  }
 }

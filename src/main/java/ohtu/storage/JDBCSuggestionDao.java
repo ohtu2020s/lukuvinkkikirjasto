@@ -105,6 +105,11 @@ class StringDataProvider implements SuggestionDataProvider {
   public Optional<String> getString(String name) {
     return Optional.ofNullable(fields.get(name));
   }
+
+  public Optional<Integer> getInteger(String name) {
+    return Optional.ofNullable(fields.get(name))
+      .map(Integer::valueOf);
+  }
 }
 
 /**
@@ -302,5 +307,42 @@ public class JDBCSuggestionDao implements SuggestionDao {
     }
 
     return suggestions;
+  }
+
+  public Suggestion getSuggestionById(int id) {
+    try {
+      PreparedStatement stmt = connection
+        .prepareStatement(
+          "SELECT suggestions.suggestion_id, kind, field_name, field_value " +
+          "FROM suggestions " +
+          "LEFT JOIN suggestion_fields " +
+          "  ON suggestions.suggestion_id = suggestion_fields.suggestion_id " +
+          "WHERE suggestions.suggestion_id = ?"
+        );
+
+      stmt.setInt(1, id);
+
+      ResultSet rows = stmt.executeQuery();
+      StringDataProvider data = new StringDataProvider();
+      String kind = null;
+
+      while (rows.next()) {
+        if (kind == null) {
+          kind = rows.getString("kind");
+        }
+
+        data.setField(rows.getString("field_name"), rows.getString("field_value"));
+      }
+
+      if (kind == null) {
+        return null;
+      }
+
+      return SuggestionFactory.create(kind, data);
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+    }
+
+    return null;
   }
 }

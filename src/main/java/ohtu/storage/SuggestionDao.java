@@ -35,4 +35,6 @@ public interface SuggestionDao {
    * @return A list of all stored {@link Suggestion Suggestions}.
    */
   List<Suggestion> getSuggestions();
+
+  Suggestion getSuggestionById(int id);
 }
