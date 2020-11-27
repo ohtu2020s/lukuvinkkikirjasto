@@ -19,11 +19,6 @@ public class ConsoleIO implements IO {
     }
 
     public void print(String m) {
-        System.out.println(m);
+        System.out.print(m);
     }
-    public String readLine(String prompt) {
-        System.out.println(prompt);
-        return lukija.nextLine();
-    }
-
 }
