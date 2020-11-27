@@ -10,7 +10,7 @@ import java.util.List;
 import ohtu.io.StubIO;
 import ohtu.storage.InMemorySuggestionDao;
 import static org.junit.Assert.*;
-import ohtu.ui.textUI;
+import ohtu.ui.TextUI;
 
 public class Stepdefs {
 
@@ -31,7 +31,7 @@ public class Stepdefs {
         inputLines.add("new");
 
         io = new StubIO(inputLines);
-        textUI kayttoliittyma = new textUI(io, memoryDao);
+        TextUI kayttoliittyma = new TextUI(io, memoryDao);
         kayttoliittyma.launch();
     }
     

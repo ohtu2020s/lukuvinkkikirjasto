@@ -2,7 +2,7 @@ package ohtu;
 
 import ohtu.io.ConsoleIO;
 import ohtu.storage.JDBCSuggestionDao;
-import ohtu.ui.textUI;
+import ohtu.ui.TextUI;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,7 +21,7 @@ public class Main {
         }
         dao = new JDBCSuggestionDao(connection);
 
-        textUI kayttoliittyma = new textUI(new ConsoleIO(), dao);
+        TextUI kayttoliittyma = new TextUI(new ConsoleIO(), dao);
         kayttoliittyma.launch();
     }
 }

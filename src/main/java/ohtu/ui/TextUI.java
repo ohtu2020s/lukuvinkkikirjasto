@@ -10,12 +10,12 @@ import ohtu.storage.SuggestionDao;
  * User Interface
  *
  */
-public class textUI {
+public class TextUI {
 
     private final IO io;
     private final SuggestionDao dao;
 
-    public textUI(IO io, SuggestionDao dao) {
+    public TextUI(IO io, SuggestionDao dao) {
         this.io = io;
         this.dao = dao;
     }
