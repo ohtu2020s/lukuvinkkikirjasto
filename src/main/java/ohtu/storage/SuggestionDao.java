@@ -37,4 +37,6 @@ public interface SuggestionDao {
   List<Suggestion> getSuggestions();
 
   Suggestion getSuggestionById(int id);
+
+  void updateSuggestion(Suggestion id);
 }

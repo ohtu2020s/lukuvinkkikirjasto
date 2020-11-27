@@ -21,18 +21,18 @@ import ohtu.domain.SuggestionVisitor;
  * Implementation of {@link SuggestionVisitor} that stores the fields' values
  * as rows in the {@code suggestion_fields} table.
  */
-class SuggestionFieldInsertor implements SuggestionVisitor {
+abstract class SerializingVisitor implements SuggestionVisitor {
   /**
    * Handle to the JDBC database connection.
    */
-  private Connection connection;
+  Connection connection;
 
   /**
    * The suggestion that is going to be stored.
    */
-  private Suggestion suggestion;
+  Suggestion suggestion;
 
-  SuggestionFieldInsertor(Connection connection, Suggestion suggestion) {
+  SerializingVisitor(Connection connection, Suggestion suggestion) {
     this.connection = connection;
     this.suggestion = suggestion;
   }
@@ -45,7 +45,32 @@ class SuggestionFieldInsertor implements SuggestionVisitor {
    * @param value Field's value in it's serialized form.
    *   Corresponds directly to the {@code field_value} column in the {@code suggestion_fields} table.
    */
-  private void insertField(String field, String value) {
+  abstract void visitSerializedField(String field, String value);
+
+  /**
+   * Stores a field with a {@link String} value in the database.
+   *
+   * The database stores the values as strings, so no conversion
+   * is needed and the value can be stored as-is.
+   */
+  @Override
+  public void visitString(SuggestionFieldValue<String> field) {
+    visitSerializedField(field.getName(), field.getValue());
+  }
+
+  @Override
+  public void visitInteger(SuggestionFieldValue<Integer> field) {
+    visitSerializedField(field.getName(), field.getValue().toString());
+  }
+}
+
+class SuggestionFieldInsertor extends SerializingVisitor {
+  SuggestionFieldInsertor(Connection conn, Suggestion suggestion) {
+    super(conn, suggestion);
+  }
+
+  @Override
+  public void visitSerializedField(String field, String value) {
     String sql = "INSERT INTO suggestion_fields (suggestion_id, field_name, field_value) VALUES (?, ?, ?)";
 
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -58,16 +83,29 @@ class SuggestionFieldInsertor implements SuggestionVisitor {
       sqle.printStackTrace();
     }
   }
+}
 
-  /**
-   * Stores a field with a {@link String} value in the database.
-   *
-   * The database stores the values as strings, so no conversion
-   * is needed and the value can be stored as-is.
-   */
+class SuggestionFieldUpdater extends SerializingVisitor {
+  SuggestionFieldUpdater(Connection conn, Suggestion suggestion) {
+    super(conn, suggestion);
+  }
+
   @Override
-  public void visitString(SuggestionFieldValue<String> field) {
-    insertField(field.getName(), field.getValue());
+  public void visitSerializedField(String field, String value) {
+    String sql =
+      "UPDATE suggestion_fields " +
+      "SET field_value = ? "+
+      "WHERE suggestion_id = ? AND field_name = ?";
+
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+      stmt.setString(1, value);
+      stmt.setInt(2, suggestion.getId());
+      stmt.setString(3, field);
+
+      stmt.executeUpdate();
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+    }
   }
 }
 
@@ -344,5 +382,19 @@ public class JDBCSuggestionDao implements SuggestionDao {
     }
 
     return null;
+  }
+
+  public void updateSuggestion(Suggestion suggestion) {
+    suggestion.visit(new SuggestionFieldUpdater(connection, suggestion));
+
+    try {
+      connection.commit();
+    } catch (SQLException sqle) {
+      try {
+        connection.rollback();
+      } catch (SQLException sqle2) {
+        sqle2.printStackTrace();
+      }
+    }
   }
 }

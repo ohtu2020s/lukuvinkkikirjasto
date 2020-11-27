@@ -40,6 +40,6 @@ public class JDBCSuggestionDaoTest extends SuggestionDAOTest<JDBCSuggestionDao> 
 
     results = connection.createStatement()
       .executeQuery("SELECT COUNT(*) FROM suggestion_fields");
-    assertEquals(3, results.getInt(1));
+    assertEquals(4, results.getInt(1));
   }
 }
