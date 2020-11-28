@@ -5,8 +5,6 @@ package ohtu.domain;
  */
 @SuggestionKind("BOOK")
 public class BookSuggestion extends Suggestion {
-  public static String KIND = "BOOK";
-
   /**
    * International Standard Book Number of the suggested book.
    *
@@ -16,13 +14,9 @@ public class BookSuggestion extends Suggestion {
   @SuggestionField(display = "ISBN")
   private String isbn;
 
-  public String getKind() {
-    return KIND;
-  }
-
   @Override
   public String toString() {
-    return String.join(", ", super.getTitle(), KIND.toLowerCase(), super.getAuthor());
+    return String.join(", ", super.getTitle(), getKind().toLowerCase(), super.getAuthor());
   }
 
   /**

@@ -31,6 +31,10 @@ public class SuggestionFieldValue<T extends Object> {
   }
 
   public <T2> SuggestionFieldValue<T2> cast(Class<T2> type) {
+    if (this.value == null && !type.isAssignableFrom(field.getType())) {
+      throw new ClassCastException(field.getType() + " cannot be assigned to " + type);
+    }
+
     T2 value = type.cast(this.value);
     return new SuggestionFieldValue<T2>(object, field, annotation, value);
   }
@@ -48,7 +52,7 @@ public class SuggestionFieldValue<T extends Object> {
       return annotation.display();
     }
 
-    return Character.toUpperCase(getName().charAt(0)) + getName().substring(1);
+    return Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
   }
 
   public T getValue() {

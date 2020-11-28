@@ -7,6 +7,39 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SuggestionTest {
   @Test
+  void suggestionKindIsReturnedCorrectly() {
+    assertEquals("BOOK", new BookSuggestion().getKind());
+  }
+
+  private static class NoKind extends Suggestion {
+    String nonSuggestionField;
+
+    @Override
+    public String toString() {
+      return "NoKind";
+    }
+  }
+
+  @Test
+  void suggestionKindReturnsNullIfNotDefined() {
+    assertNull(Suggestion.getKind(NoKind.class));
+  }
+
+  @Test
+  void nonSuggestionFieldsAreNotVisited() {
+    final int[] visited = { 0 };
+
+    new NoKind().visit(new SuggestionVisitor() {
+      @Override
+      public void visit(SuggestionFieldValue<?> field) {
+        visited[0]++;
+      }
+    });
+
+    assertEquals(3, visited[0]);
+  }
+
+  @Test
   void suggestionIsVisitedCorrectly() {
     Suggestion sugg = new BookSuggestion();
 

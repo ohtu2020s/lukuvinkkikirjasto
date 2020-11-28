@@ -26,8 +26,17 @@ public class BookSuggestionTest {
     assertTrue(isbnVisited[0]);
   }
 
+  @Test
+  void bookSuggestionToStringWorks() {
+    BookSuggestion suggestion = new BookSuggestion();
+    suggestion.setTitle("Title");
+    suggestion.setAuthor("Author");
+    assertEquals("Title, book, Author", suggestion.toString());
+  }
+
   @Nested
   class CreationTests {
+    String kind = Suggestion.getKind(BookSuggestion.class);
     MockDataProvider mock;
 
     @BeforeEach
@@ -37,14 +46,14 @@ public class BookSuggestionTest {
 
     @Test
     void classOfTheBuiltInstanceMatchesTheKindWhenItsBook() {
-      Suggestion sugg = SuggestionFactory.create(BookSuggestion.KIND, mock);
+      Suggestion sugg = SuggestionFactory.create(kind, mock);
       assertTrue(sugg instanceof BookSuggestion);
     }
 
     @Test
     void bookSuggestionIsbnIsSetCorrectly() {
       mock.setString("isbn", "978-1451673319");
-      BookSuggestion sugg = (BookSuggestion) SuggestionFactory.create(BookSuggestion.KIND, mock);
+      BookSuggestion sugg = (BookSuggestion) SuggestionFactory.create(kind, mock);
       assertEquals(sugg.getIsbn(), "978-1451673319");
     }
   }

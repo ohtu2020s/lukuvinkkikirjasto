@@ -97,6 +97,8 @@ class SuggestionFieldUpdater extends SerializingVisitor {
       "SET field_value = ? "+
       "WHERE suggestion_id = ? AND field_name = ?";
 
+    System.out.println("Set " + field + " to " + value + " on " + suggestion.getId());
+
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       stmt.setString(1, value);
       stmt.setInt(2, suggestion.getId());
@@ -390,11 +392,7 @@ public class JDBCSuggestionDao implements SuggestionDao {
     try {
       connection.commit();
     } catch (SQLException sqle) {
-      try {
-        connection.rollback();
-      } catch (SQLException sqle2) {
-        sqle2.printStackTrace();
-      }
+      sqle.printStackTrace();
     }
   }
 }

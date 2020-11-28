@@ -54,6 +54,7 @@ public interface SuggestionVisitor {
       }
     }
 
+
     throw new IllegalArgumentException(
       String.format("field '%s' has unsupported type %s", field.getName(), field.getType())
     );
