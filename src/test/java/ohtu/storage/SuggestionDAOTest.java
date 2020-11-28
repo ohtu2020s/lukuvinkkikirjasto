@@ -71,4 +71,62 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
 
     assertEquals(sugg.getIsbn(), retrieved.getIsbn());
   }
+
+  @Test
+  void suggestionCanBeRetrievedByItsId() {
+    BookSuggestion sugg = createBookSuggestion();
+    dao.saveSuggestion(sugg);
+
+    Suggestion retrieved = dao.getSuggestionById(sugg.getId());
+    assertTrue(retrieved != null);
+  }
+
+  @Test
+  void suggestionRetrievedByItsIdHasCorrectKind() {
+    BookSuggestion sugg = createBookSuggestion();
+    dao.saveSuggestion(sugg);
+
+    Suggestion retrieved = dao.getSuggestionById(sugg.getId());
+    assertEquals(retrieved.getKind(), sugg.getKind());
+  }
+
+  @Test
+  void suggestionRetrievedByItsIdHasCorrectFields() {
+    BookSuggestion sugg = createBookSuggestion();
+    dao.saveSuggestion(sugg);
+
+    Suggestion retrieved = dao.getSuggestionById(sugg.getId());
+    assertEquals(retrieved.getId(), sugg.getId());
+    assertEquals(retrieved.getTitle(), sugg.getTitle());
+    assertEquals(retrieved.getAuthor(), sugg.getAuthor());
+  }
+
+  @Test
+  void tryingToRetrieveNonexistentSuggestionReturnsNull() {
+    assertNull(dao.getSuggestionById(123));
+  }
+
+  @Test
+  void tryingToUpdateNonexitentSuggestionThrows() {
+    assertThrows(NoSuchSuggestionException.class, () -> {
+      dao.updateSuggestion(createBookSuggestion());
+    });
+  }
+
+  @Test
+  void updatingAnExistingSuggestionChangesTheFields() throws NoSuchSuggestionException {
+    BookSuggestion s = createBookSuggestion();
+    dao.saveSuggestion(s);
+
+    s.setTitle("New Title");
+    s.setAuthor("New Author");
+    s.setIsbn("New Isbn");
+
+    dao.updateSuggestion(s);
+    BookSuggestion s2 = (BookSuggestion) dao.getSuggestionById(s.getId());
+
+    assertEquals("New Title", s2.getTitle());
+    assertEquals("New Author", s2.getAuthor());
+    assertEquals("New Isbn", s2.getIsbn());
+  }
 }

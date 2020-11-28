@@ -86,6 +86,8 @@ class SuggestionFieldInsertor extends SerializingVisitor {
 }
 
 class SuggestionFieldUpdater extends SerializingVisitor {
+  int updatedFields = 0;
+
   SuggestionFieldUpdater(Connection conn, Suggestion suggestion) {
     super(conn, suggestion);
   }
@@ -97,14 +99,14 @@ class SuggestionFieldUpdater extends SerializingVisitor {
       "SET field_value = ? "+
       "WHERE suggestion_id = ? AND field_name = ?";
 
-    System.out.println("Set " + field + " to " + value + " on " + suggestion.getId());
-
     try (PreparedStatement stmt = connection.prepareStatement(sql)) {
       stmt.setString(1, value);
       stmt.setInt(2, suggestion.getId());
       stmt.setString(3, field);
 
       stmt.executeUpdate();
+      
+      updatedFields += stmt.getUpdateCount();
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -386,8 +388,13 @@ public class JDBCSuggestionDao implements SuggestionDao {
     return null;
   }
 
-  public void updateSuggestion(Suggestion suggestion) {
-    suggestion.visit(new SuggestionFieldUpdater(connection, suggestion));
+  public void updateSuggestion(Suggestion suggestion) throws NoSuchSuggestionException {
+    SuggestionFieldUpdater updater = new SuggestionFieldUpdater(connection, suggestion);
+    suggestion.visit(updater);
+
+    if (updater.updatedFields == 0) {
+      throw new NoSuchSuggestionException(suggestion.getId());
+    }
 
     try {
       connection.commit();

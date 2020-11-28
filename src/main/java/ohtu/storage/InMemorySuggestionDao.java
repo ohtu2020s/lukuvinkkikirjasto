@@ -105,11 +105,13 @@ public class InMemorySuggestionDao implements SuggestionDao {
     return SuggestionFactory.create(pair.getValue0(), pair.getValue1());
   }
 
-  public void updateSuggestion(Suggestion suggestion) {
+  public void updateSuggestion(Suggestion suggestion) throws NoSuchSuggestionException {
     Pair<String, SuggestionFieldHashMap> pair = data.get(suggestion.getId());
 
-    if (pair != null) {
-      suggestion.visit(pair.getValue1());
+    if (pair == null) {
+      throw new NoSuchSuggestionException(suggestion.getId());
     }
+
+    suggestion.visit(pair.getValue1());
   }
 }

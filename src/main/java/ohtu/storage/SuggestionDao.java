@@ -38,5 +38,5 @@ public interface SuggestionDao {
 
   Suggestion getSuggestionById(int id);
 
-  void updateSuggestion(Suggestion id);
+  void updateSuggestion(Suggestion id) throws NoSuchSuggestionException;
 }

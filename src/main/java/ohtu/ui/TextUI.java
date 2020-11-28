@@ -6,6 +6,7 @@ import ohtu.domain.Suggestion;
 import java.util.ArrayList;
 
 import ohtu.io.IO;
+import ohtu.storage.NoSuchSuggestionException;
 import ohtu.storage.SuggestionDao;
 import ohtu.domain.SuggestionVisitor;
 import ohtu.domain.SuggestionFieldValue;
@@ -128,7 +129,11 @@ outer:
             }
         });
 
-        dao.updateSuggestion(suggestion);
+        try {
+          dao.updateSuggestion(suggestion);
+        } catch (NoSuchSuggestionException snse) {
+          io.println("Error while updating the suggestion!");
+        }
     }
 
     private void commandQuit() {
