@@ -152,6 +152,9 @@ public abstract class Suggestion {
     });
   }
 
+  /**
+   * Gets the kind identifier of the specified subclass.
+   */
   public static String getKind(Class<? extends Suggestion> suggestionClass) {
       SuggestionKind annotation = suggestionClass.getAnnotation(SuggestionKind.class);
 
@@ -162,6 +165,9 @@ public abstract class Suggestion {
       return annotation.value();
   } 
 
+  /**
+   * Gets the kind of this instance.
+   */
   public String getKind() {
     return Suggestion.getKind(getClass());
   }

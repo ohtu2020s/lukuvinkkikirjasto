@@ -2,20 +2,46 @@ package ohtu.domain;
 
 import java.lang.reflect.Field;
 
+/**
+ * Represents a field of a {@link Suggestion} instance on runtime.
+ */
 public class SuggestionFieldValue<T extends Object> {
-  private Object object;
+  /**
+   * The instance this field is part of.
+   */
+  private Suggestion object;
+
+  /**
+   * The Java field in the {@link Suggestion} instance {@link #object}.
+   */
   private Field field;
+
+  /**
+   * Value of the annotation on the Java field.
+   */
   private SuggestionField annotation;
+
+  /**
+   * Value of the field.
+   */
   private T value;
 
-  public SuggestionFieldValue(Object object, Field field, SuggestionField annotation, T value) {
+  private SuggestionFieldValue(Suggestion object, Field field, SuggestionField annotation, T value) {
     this.object = object;
     this.field = field;
     this.annotation = annotation;
     this.value = value;
   }
 
-  public static SuggestionFieldValue<Object> fromField(Object object, Field field) {
+  /**
+   * Creates an instance from an {@link Suggestion} instance and a {@link Field} of that instance.
+   *
+   * @param object The {@link Suggestion} instance of which {@code field} is part of.
+   * @param field Field in the {@code object}. Should be annotated with {@link SuggestionField}.
+   *
+   * @return An instance representing the given field.
+   */
+  public static SuggestionFieldValue<Object> fromField(Suggestion object, Field field) throws IllegalArgumentException {
     SuggestionField annotation = field.getAnnotation(SuggestionField.class);
 
     if (annotation == null) {
@@ -30,6 +56,11 @@ public class SuggestionFieldValue<T extends Object> {
     }
   }
 
+  /**
+   * Tries to cast this instance to an instance with different, but compatible, wrapped type.
+   *
+   * @param type Class of the type into which casting is tried.
+   */
   public <T2> SuggestionFieldValue<T2> cast(Class<T2> type) {
     if (this.value == null && !type.isAssignableFrom(field.getType())) {
       throw new ClassCastException(field.getType() + " cannot be assigned to " + type);
@@ -39,6 +70,14 @@ public class SuggestionFieldValue<T extends Object> {
     return new SuggestionFieldValue<T2>(object, field, annotation, value);
   }
 
+  /**
+   * Gets the non-user-facing name of the field.
+   *
+   * This value can be defined with the {@link SuggestionField#name} property.
+   * Defaults to the name of the Java field.
+   *
+   * @return Non-user-facing name of the field.
+   */
   public String getName() {
     if (!annotation.name().equals("")) {
       return annotation.name();
@@ -47,6 +86,14 @@ public class SuggestionFieldValue<T extends Object> {
     return field.getName();
   }
 
+  /**
+   * Gets the user-facing name of the field.
+   *
+   * This value can be defined with the {@link SuggestionField#name} property.
+   * Defaults to capitalized version of the Java field's name.
+   *
+   * @return User-facing name of the field.
+   */
   public String getDisplayName() {
     if (!annotation.display().equals("")) {
       return annotation.display();
@@ -55,14 +102,23 @@ public class SuggestionFieldValue<T extends Object> {
     return Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
   }
 
+  /**
+   * Gets the value of the field.
+   */
   public T getValue() {
     return value;
   }
 
+  /**
+   * Gets the {@link Class} representing the field's type.
+   */
   public Class<T> getType() {
     return (Class<T>) field.getType();
   }
 
+  /**
+   * Sets the fields value.
+   */
   public void setValue(T value) {
     this.value = value;
 
@@ -73,6 +129,11 @@ public class SuggestionFieldValue<T extends Object> {
     }
   }
 
+  /**
+   * Populates the field with a value from {@code dataProvider}.
+   *
+   * @param dataProvider Data provider from which the new value for this field is fetched.
+   */
   public void populate(SuggestionDataProvider dataProvider) {
     (new SuggestionVisitor() {
       @Override

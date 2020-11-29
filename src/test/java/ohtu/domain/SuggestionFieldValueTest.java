@@ -6,19 +6,30 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.lang.reflect.Field;
 
 class SuggestionFieldValueTest {
-  int fieldWithNoAnnotation;
+  static class TestSuggestion extends Suggestion {
+    int fieldWithNoAnnotation;
 
-  class AnotherType {
+    @Override
+    public String toString() {
+      return "test";
+    }
+  }
+  static class AnotherTestSuggestion extends Suggestion {
     @SuggestionField(name = "customname")
     int anotherField;
 
     @SuggestionField(display = "CustomDisplayName")
     int anotherFieldWithDisplayName;
+
+    @Override
+    public String toString() {
+      return "test2";
+    }
   }
 
   @Test
   void tryingToCreateFromFieldWithoutAnnotationThrows() throws NoSuchFieldException {
-    Object obj = new SuggestionFieldValueTest();
+    Suggestion obj = new TestSuggestion();
     Field field = obj.getClass().getDeclaredField("fieldWithNoAnnotation");
 
     assertThrows(IllegalArgumentException.class, () -> {
@@ -28,8 +39,8 @@ class SuggestionFieldValueTest {
 
   @Test
   void tryingToCreateFromInvalidFieldThrows() throws NoSuchFieldException {
-    Object obj = new SuggestionFieldValueTest();
-    Field field = AnotherType.class.getDeclaredField("anotherField");
+    Suggestion obj = new TestSuggestion();
+    Field field = AnotherTestSuggestion.class.getDeclaredField("anotherField");
 
     assertThrows(IllegalArgumentException.class, () -> {
       SuggestionFieldValue.fromField(obj, field);
@@ -38,7 +49,7 @@ class SuggestionFieldValueTest {
 
   @Test
   void defaultDisplayNameIsCapitalized() throws NoSuchFieldException {
-    Object obj = new AnotherType();
+    Suggestion obj = new AnotherTestSuggestion();
     Field field = obj.getClass().getDeclaredField("anotherField");
     SuggestionFieldValue<Object> value = SuggestionFieldValue.fromField(obj, field);
 
@@ -47,7 +58,7 @@ class SuggestionFieldValueTest {
 
   @Test
   void explicitlyDefinedFieldNameIsReturnedCorrectly() throws NoSuchFieldException {
-    Object obj = new AnotherType();
+    Suggestion obj = new AnotherTestSuggestion();
     Field field = obj.getClass().getDeclaredField("anotherField");
     SuggestionFieldValue<Object> value = SuggestionFieldValue.fromField(obj, field);
 
@@ -56,7 +67,7 @@ class SuggestionFieldValueTest {
 
   @Test
   void explicitlyDefinedDisplayNameIsReturnedCorrectly() throws NoSuchFieldException {
-    Object obj = new AnotherType();
+    Suggestion obj = new AnotherTestSuggestion();
     Field field = obj.getClass().getDeclaredField("anotherFieldWithDisplayName");
     SuggestionFieldValue<Object> value = SuggestionFieldValue.fromField(obj, field);
 
