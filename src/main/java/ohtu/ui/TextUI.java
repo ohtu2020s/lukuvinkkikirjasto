@@ -3,7 +3,9 @@ package ohtu.ui;
 import ohtu.Main;
 import ohtu.domain.BookSuggestion;
 import ohtu.domain.Suggestion;
+
 import java.util.ArrayList;
+import java.util.Optional;
 
 import ohtu.io.IO;
 import ohtu.storage.NoSuchSuggestionException;
@@ -17,7 +19,7 @@ class Command {
     Handler handler;
 
     static interface Handler {
-        void handle();
+        void handle() throws InterruptedException;
     }
 
     Command(String name, String description, Handler handler) {
@@ -32,11 +34,11 @@ class Command {
  *
  */
 public class TextUI {
-    private static ArrayList<Command> commands = new ArrayList<>();
+    private ArrayList<Command> commands = new ArrayList<>();
 
     private IO io;
     private SuggestionDao dao;
-    private boolean terminate = false;
+    private boolean terminated = false;
 
     public TextUI(IO io, SuggestionDao dao) {
         this.io = io;
@@ -62,21 +64,25 @@ public class TextUI {
         }
 
 outer:
-        while (!terminate) {
-            String input = io.prompt("> ");
+        while (!terminated) {
+            try {
+                String input = io.prompt("> ");
 
-            for (Command cmd : commands) {
-                if (cmd.name.equals(input)) {
-                    cmd.handler.handle();
-                    continue outer;
+                for (Command cmd : commands) {
+                    if (cmd.name.equals(input)) {
+                        cmd.handler.handle();
+                        continue outer;
+                    }
                 }
-            }
 
-            io.println("Unknown command: " + input);
+                io.println("Unknown command: " + input);
+            } catch (InterruptedException ie) {
+                break;
+            }
         }
     }
 
-    private void commandNew() {
+    private void commandNew() throws InterruptedException {
         String input = io.prompt("Select suggestion type (only 'book' for now): ");
         
         if (input.equalsIgnoreCase("book")) {
@@ -102,7 +108,30 @@ outer:
         }
     }
 
-    private void commandEdit() {
+    class SuggestionEditor implements SuggestionVisitor {
+        private Optional<InterruptedException> interrupt = Optional.empty();
+
+        @Override
+        public void visitString(SuggestionFieldValue<String> field) {
+            if (interrupt.isPresent())
+                return;
+
+            try {
+                String newValue = io.prompt("  " + field.getDisplayName() + ": ", field.getValue());
+                field.setValue(newValue);
+            } catch (InterruptedException ie) {
+                interrupt = Optional.of(ie);
+            }
+        }
+
+        public void finish() throws InterruptedException {
+            if (interrupt.isPresent()) {
+                throw interrupt.get();
+            }
+        }
+    }
+
+    private void commandEdit() throws InterruptedException {
         for (Suggestion item : dao.getSuggestions()) {
             io.println(String.format("%3s [%s] %s", item.getId() + ":", item.getKind(), item.getTitle()));
         }
@@ -121,13 +150,14 @@ outer:
 
         Suggestion suggestion = dao.getSuggestionById(id);
 
-        suggestion.visit(new SuggestionVisitor() {
-            @Override
-            public void visitString(SuggestionFieldValue<String> field) {
-                String newValue = io.prompt("  " + field.getDisplayName() + ": ", field.getValue());
-                field.setValue(newValue);
-            }
-        });
+        if (suggestion == null) {
+            io.println("Invalid ID: " + input);
+            return;
+        }
+
+        SuggestionEditor editor = new SuggestionEditor();
+        suggestion.visit(editor);
+        editor.finish();
 
         try {
           dao.updateSuggestion(suggestion);
@@ -137,6 +167,6 @@ outer:
     }
 
     private void commandQuit() {
-        terminate = true;
+        terminated = true;
     }
 }
