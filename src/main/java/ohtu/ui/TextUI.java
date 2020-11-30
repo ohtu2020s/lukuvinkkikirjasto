@@ -104,7 +104,7 @@ outer:
 
     private void commandShow() {
         for (Suggestion item : dao.getSuggestions()) {
-            System.out.println(item.toString());
+            io.println(item.toString());
         }
     }
 
