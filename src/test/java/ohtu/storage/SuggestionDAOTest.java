@@ -9,124 +9,159 @@ import ohtu.domain.BookSuggestion;
 import ohtu.domain.Suggestion;
 
 public abstract class SuggestionDAOTest<T extends SuggestionDao> {
-  SuggestionDao dao;
 
-  abstract SuggestionDao createSuggestionDao();
+    SuggestionDao dao;
 
-  BookSuggestion createBookSuggestion() {
-    BookSuggestion sugg = new BookSuggestion();
-    sugg.setTitle("Infinite Jest");
-    sugg.setAuthor("David Foster Wallace");
-    sugg.setIsbn("9780316920049");
-    return sugg;
-  }
+    abstract SuggestionDao createSuggestionDao();
 
-  @BeforeEach
-  void initializeDao() {
-    dao = createSuggestionDao();
-    dao.setup();
-  }
+    BookSuggestion createBookSuggestion() {
+        BookSuggestion sugg = new BookSuggestion();
+        sugg.setTitle("Infinite Jest");
+        sugg.setAuthor("David Foster Wallace");
+        sugg.setIsbn("9780316920049");
+        return sugg;
+    }
 
-  @Test
-  void suggestionCanBeRetrieved() {
-    BookSuggestion sugg = createBookSuggestion();
-    dao.saveSuggestion(sugg);
+    @BeforeEach
+    void initializeDao() {
+        dao = createSuggestionDao();
+        dao.setup();
+    }
 
-    List<Suggestion> suggestions = dao.getSuggestions();
+    @Test
+    void suggestionCanBeRetrieved() {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
 
-    assertEquals(1, suggestions.size());
-  }
+        List<Suggestion> suggestions = dao.getSuggestions();
 
-  @Test
-  void commonSuggestionFieldsAreRetrievedCorrectly() {
-    BookSuggestion sugg = createBookSuggestion();
-    dao.saveSuggestion(sugg);
+        assertEquals(1, suggestions.size());
+    }
 
-    List<Suggestion> suggestions = dao.getSuggestions();
-    Suggestion retrieved = suggestions.get(0);
+    @Test
+    void commonSuggestionFieldsAreRetrievedCorrectly() {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
 
-    assertEquals(sugg.getTitle(), retrieved.getTitle());
-    assertEquals(sugg.getAuthor(), retrieved.getAuthor());
-  }
+        List<Suggestion> suggestions = dao.getSuggestions();
+        Suggestion retrieved = suggestions.get(0);
 
-  @Test
-  void retrievedSuggestionIsOfTheCorrectSubClass() {
-    BookSuggestion sugg = createBookSuggestion();
+        assertEquals(sugg.getTitle(), retrieved.getTitle());
+        assertEquals(sugg.getAuthor(), retrieved.getAuthor());
+    }
 
-    dao.saveSuggestion(sugg);
+    @Test
+    void retrievedSuggestionIsOfTheCorrectSubClass() {
+        BookSuggestion sugg = createBookSuggestion();
 
-    List<Suggestion> suggestions = dao.getSuggestions();
-    Suggestion retrieved = suggestions.get(0);
+        dao.saveSuggestion(sugg);
 
-    assertTrue(retrieved instanceof BookSuggestion);
-  }
+        List<Suggestion> suggestions = dao.getSuggestions();
+        Suggestion retrieved = suggestions.get(0);
 
-  @Test
-  void retrievedSuggestionHasCorrectSubclassFieldValues() {
-    BookSuggestion sugg = createBookSuggestion();
-    dao.saveSuggestion(sugg);
+        assertTrue(retrieved instanceof BookSuggestion);
+    }
 
-    List<Suggestion> suggestions = dao.getSuggestions();
-    BookSuggestion retrieved = (BookSuggestion) suggestions.get(0);
+    @Test
+    void retrievedSuggestionHasCorrectSubclassFieldValues() {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
 
-    assertEquals(sugg.getIsbn(), retrieved.getIsbn());
-  }
+        List<Suggestion> suggestions = dao.getSuggestions();
+        BookSuggestion retrieved = (BookSuggestion) suggestions.get(0);
 
-  @Test
-  void suggestionCanBeRetrievedByItsId() {
-    BookSuggestion sugg = createBookSuggestion();
-    dao.saveSuggestion(sugg);
+        assertEquals(sugg.getIsbn(), retrieved.getIsbn());
+    }
 
-    Suggestion retrieved = dao.getSuggestionById(sugg.getId());
-    assertTrue(retrieved != null);
-  }
+    @Test
+    void suggestionCanBeRetrievedByItsId() {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
 
-  @Test
-  void suggestionRetrievedByItsIdHasCorrectKind() {
-    BookSuggestion sugg = createBookSuggestion();
-    dao.saveSuggestion(sugg);
+        Suggestion retrieved = dao.getSuggestionById(sugg.getId());
+        assertTrue(retrieved != null);
+    }
 
-    Suggestion retrieved = dao.getSuggestionById(sugg.getId());
-    assertEquals(retrieved.getKind(), sugg.getKind());
-  }
+    @Test
+    void suggestionRetrievedByItsIdHasCorrectKind() {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
 
-  @Test
-  void suggestionRetrievedByItsIdHasCorrectFields() {
-    BookSuggestion sugg = createBookSuggestion();
-    dao.saveSuggestion(sugg);
+        Suggestion retrieved = dao.getSuggestionById(sugg.getId());
+        assertEquals(retrieved.getKind(), sugg.getKind());
+    }
 
-    Suggestion retrieved = dao.getSuggestionById(sugg.getId());
-    assertEquals(retrieved.getId(), sugg.getId());
-    assertEquals(retrieved.getTitle(), sugg.getTitle());
-    assertEquals(retrieved.getAuthor(), sugg.getAuthor());
-  }
+    @Test
+    void suggestionRetrievedByItsIdHasCorrectFields() {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
 
-  @Test
-  void tryingToRetrieveNonexistentSuggestionReturnsNull() {
-    assertNull(dao.getSuggestionById(123));
-  }
+        Suggestion retrieved = dao.getSuggestionById(sugg.getId());
+        assertEquals(retrieved.getId(), sugg.getId());
+        assertEquals(retrieved.getTitle(), sugg.getTitle());
+        assertEquals(retrieved.getAuthor(), sugg.getAuthor());
+    }
 
-  @Test
-  void tryingToUpdateNonexitentSuggestionThrows() {
-    assertThrows(NoSuchSuggestionException.class, () -> {
-      dao.updateSuggestion(createBookSuggestion());
-    });
-  }
+    @Test
+    void tryingToRetrieveNonexistentSuggestionReturnsNull() {
+        assertNull(dao.getSuggestionById(123));
+    }
 
-  @Test
-  void updatingAnExistingSuggestionChangesTheFields() throws NoSuchSuggestionException {
-    BookSuggestion s = createBookSuggestion();
-    dao.saveSuggestion(s);
+    @Test
+    void tryingToUpdateNonexitentSuggestionThrows() {
+        assertThrows(NoSuchSuggestionException.class, () -> {
+            dao.updateSuggestion(createBookSuggestion());
+        });
+    }
 
-    s.setTitle("New Title");
-    s.setAuthor("New Author");
-    s.setIsbn("New Isbn");
+    @Test
+    void updatingAnExistingSuggestionChangesTheFields() throws NoSuchSuggestionException {
+        BookSuggestion s = createBookSuggestion();
+        dao.saveSuggestion(s);
 
-    dao.updateSuggestion(s);
-    BookSuggestion s2 = (BookSuggestion) dao.getSuggestionById(s.getId());
+        s.setTitle("New Title");
+        s.setAuthor("New Author");
+        s.setIsbn("New Isbn");
 
-    assertEquals("New Title", s2.getTitle());
-    assertEquals("New Author", s2.getAuthor());
-    assertEquals("New Isbn", s2.getIsbn());
-  }
+        dao.updateSuggestion(s);
+        BookSuggestion s2 = (BookSuggestion) dao.getSuggestionById(s.getId());
+
+        assertEquals("New Title", s2.getTitle());
+        assertEquals("New Author", s2.getAuthor());
+        assertEquals("New Isbn", s2.getIsbn());
+    }
+
+    @Test
+    void existingSuggestionCanBeDeleted() throws NoSuchSuggestionException {
+        BookSuggestion sugg = createBookSuggestion();
+        dao.saveSuggestion(sugg);
+
+        List<Suggestion> suggestions = dao.getSuggestions();
+        assertEquals(1, suggestions.size());
+
+        dao.deleteSuggestion(sugg);
+
+        suggestions = dao.getSuggestions();
+        assertEquals(0, suggestions.size());
+
+    }
+
+    @Test
+    void theRightSuggestionIsDeleted() throws NoSuchSuggestionException {
+        
+        BookSuggestion suggToBeDeleted = createBookSuggestion();
+        dao.saveSuggestion(suggToBeDeleted);
+        
+        BookSuggestion suggToStay = new BookSuggestion();
+        suggToStay.setTitle("New Title");
+        suggToStay.setAuthor("New Author");
+        suggToStay.setIsbn("New Isbn");
+        dao.saveSuggestion(suggToStay);
+        
+        dao.deleteSuggestion(suggToBeDeleted);
+        
+        assertTrue(dao.getSuggestionById(suggToBeDeleted.getId())==null);
+        assertTrue(dao.getSuggestionById(suggToStay.getId())!=null);
+
+    }
 }
