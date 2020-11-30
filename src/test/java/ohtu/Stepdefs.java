@@ -20,6 +20,7 @@ import ohtu.domain.SuggestionVisitor;
 import ohtu.domain.SuggestionFieldValue;
 
 public class Stepdefs {
+
     volatile StubIO io;
     InMemorySuggestionDao memoryDao;
     TextUI ui;
@@ -40,6 +41,12 @@ public class Stepdefs {
         io.runUntil(line -> line.equals("> "));
     }
 
+    @Given("command show is selected$")
+    public void commandShowSelected() {
+        io.input("show");
+        io.runUntil(line -> line.equals("> "));
+    }
+
     @Given("command edit is selected")
     public void commandEditSelected() {
         io.input("edit");
@@ -53,6 +60,16 @@ public class Stepdefs {
         s.setAuthor(author);
         s.setIsbn(isbn);
         memoryDao.saveSuggestion(s);
+    }
+
+    @When("user inputs a valid suggestion type {string}")
+    public void userInputsAValidSuggestionType(String type) {
+        io.input(type);
+    }
+
+    @When("user inputs invalid suggestion type {string}")
+    public void userInputsInvalidSuggestionType(String type) {
+        io.input(type);
     }
 
     @When("user inputs an invalid suggestion id {int}")
@@ -94,7 +111,7 @@ public class Stepdefs {
     public void userLeavesTheISBNUnmodified() {
         io.trigger("ISBN:", null);
     }
-    
+
     @Then("system will respond with line {string}")
     public void systemWillRespondWith(String expectedOutput) {
         assertTrue(io.runUntil(expectedOutput::equals));
@@ -110,13 +127,21 @@ public class Stepdefs {
         assertTrue(io.runUntil(line -> line.equals("> ")));
     }
 
+    @Then("suggestion can be found from database with title {string}, author {string} and isbn {string}")
+    public void suggestionIsSavedToDatabase(String title, String author, String isbn) {
+        systemWillShowTheCommandPrompt();
+        fieldOfSuggestionHasValueOf("title", 0, title);
+        fieldOfSuggestionHasValueOf("author", 0, author);
+        fieldOfSuggestionHasValueOf("isbn", 0, isbn);
+    }
+
     @Then("field {string} of suggestion {int} has value of {string}")
     public void fieldOfSuggestionHasValueOf(String fieldName, int id, String value) {
         Suggestion suggestion = memoryDao.getSuggestionById(id);
 
         assertFalse(suggestion == null);
 
-        boolean[] visited = { false };
+        boolean[] visited = {false};
 
         suggestion.visit(new SuggestionVisitor() {
             @Override
