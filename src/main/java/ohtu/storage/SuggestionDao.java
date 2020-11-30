@@ -28,6 +28,7 @@ public interface SuggestionDao {
    * @param suggestion A new suggestion to be saved.
    */
   void saveSuggestion(Suggestion suggestion);
+  void deleteSuggestion(Suggestion suggestion);
 
   /**
    * Retrieves a list of all stored {@link Suggestion Suggestions}.

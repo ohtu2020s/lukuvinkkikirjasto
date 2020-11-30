@@ -297,6 +297,20 @@ public class JDBCSuggestionDao implements SuggestionDao {
       sqle.printStackTrace();
     }
   }
+  public void deleteSuggestion(Suggestion suggestion) {
+    try {
+      PreparedStatement stmt = connection
+        .prepareStatement("DELETE FROM suggestions WHERE suggestion_id = (?)");
+
+      stmt.setInt(1, suggestion.getId());
+
+      stmt.executeUpdate();
+      
+      connection.commit();
+    } catch (SQLException sqle) {
+      sqle.printStackTrace();
+    }
+  }
 
   /**
    * Gets a list of all suggestions from the database and populates them.

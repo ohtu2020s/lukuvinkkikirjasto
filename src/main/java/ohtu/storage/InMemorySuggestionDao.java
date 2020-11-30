@@ -84,6 +84,10 @@ public class InMemorySuggestionDao implements SuggestionDao {
 
     data.put(suggestion.getId(), Pair.with(suggestion.getKind(), collector));
   }
+  
+  public void deleteSuggestion(Suggestion suggestion) {
+    data.remove(suggestion.getId());
+  }
 
   /**
    * Gets a list of all stored Suggestions.
