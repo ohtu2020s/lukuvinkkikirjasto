@@ -1,4 +1,4 @@
-Feature: kayttaja voi hakea vinkkeja
+Feature: kayttaja voi hakea vinkkeja [work in progress]
 
     Scenario: käyttäjä voi listata olemassaolevat vinkit
         Given new book suggestion is created with title "title", author "author" and isbn "isbn"
