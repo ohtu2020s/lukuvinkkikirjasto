@@ -14,11 +14,13 @@ import ohtu.domain.SuggestionVisitor;
 import ohtu.domain.SuggestionFieldValue;
 
 class Command {
+
     String name;
     String description;
     Handler handler;
 
     static interface Handler {
+
         void handle() throws InterruptedException;
     }
 
@@ -34,6 +36,7 @@ class Command {
  *
  */
 public class TextUI {
+
     private ArrayList<Command> commands = new ArrayList<>();
 
     private IO io;
@@ -47,6 +50,7 @@ public class TextUI {
         addCommand("new", "create a new suggestion", this::commandNew);
         addCommand("edit", "edit an existing suggestion", this::commandEdit);
         addCommand("show", "show saved suggestions", this::commandShow);
+        addCommand("delete", "delete an existing suggestion", this::commandDelete);
         addCommand("quit", "quit the program", this::commandQuit);
     }
 
@@ -63,7 +67,7 @@ public class TextUI {
             io.println(String.format("  %-7s - %s", cmd.name, cmd.description));
         }
 
-outer:
+        outer:
         while (!terminated) {
             try {
                 String input = io.prompt("> ");
@@ -84,7 +88,7 @@ outer:
 
     private void commandNew() throws InterruptedException {
         String input = io.prompt("Select suggestion type (only 'book' for now): ");
-        
+
         if (input.equalsIgnoreCase("book")) {
             io.println("Fill in:");
 
@@ -108,13 +112,45 @@ outer:
         }
     }
 
+    private void commandDelete() throws InterruptedException {
+        for (Suggestion item : dao.getSuggestions()) {
+            io.println(String.format("%3s [%s] %s", item.getId() + ":", item.getKind(), item.getTitle()));
+        }
+
+        io.println();
+        String input = io.prompt("Select an item from the above list to DELETE by typing in it's ID: ");
+
+        Integer id = Integer.valueOf(input);
+
+        if (id == null) {
+            io.println("Invalid ID: " + input);
+            return;
+        }
+
+        Suggestion suggestion = dao.getSuggestionById(id);
+
+        if (suggestion == null) {
+            io.println("Invalid ID: " + input);
+            return;
+        }
+
+        input = io.prompt("Are you sure?: (Y/N) ");
+
+        if (input.equalsIgnoreCase("y")) {
+            dao.deleteSuggestion(suggestion);
+        }
+
+    }
+
     class SuggestionEditor implements SuggestionVisitor {
+
         private Optional<InterruptedException> interrupt = Optional.empty();
 
         @Override
         public void visitString(SuggestionFieldValue<String> field) {
-            if (interrupt.isPresent())
+            if (interrupt.isPresent()) {
                 return;
+            }
 
             try {
                 String newValue = io.prompt("  " + field.getDisplayName() + ": ", field.getValue());
@@ -138,7 +174,7 @@ outer:
 
         io.println();
         String input = io.prompt(
-            "Select an item from the above list to edit by typing in it's ID: "
+                "Select an item from the above list to edit by typing in it's ID: "
         );
 
         Integer id = Integer.valueOf(input);
@@ -160,9 +196,9 @@ outer:
         editor.finish();
 
         try {
-          dao.updateSuggestion(suggestion);
+            dao.updateSuggestion(suggestion);
         } catch (NoSuchSuggestionException snse) {
-          io.println("Error while updating the suggestion!");
+            io.println("Error while updating the suggestion!");
         }
     }
 
