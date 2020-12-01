@@ -52,6 +52,11 @@ public class Stepdefs {
         io.input("edit");
         io.runUntil(line -> line.equals("> "));
     }
+    @Given("command delete is selected")
+    public void commandDeleteSelected() {
+        io.input("delete");
+        io.runUntil(line -> line.equals("> "));
+    }
 
     @Given("new book suggestion is created with title {string}, author {string} and isbn {string}")
     public void newBookSuggestionIsCreated(String title, String author, String isbn) {
@@ -62,6 +67,11 @@ public class Stepdefs {
         memoryDao.saveSuggestion(s);
     }
 
+    @When("user inputs a valid character {string}")
+    public void userInputsAValidCharacter(String character) {
+        io.input(character);
+    }
+    
     @When("user inputs a valid suggestion type {string}")
     public void userInputsAValidSuggestionType(String type) {
         io.input(type);
@@ -154,5 +164,17 @@ public class Stepdefs {
         });
 
         assertTrue(visited[0]);
+    }
+    
+    @Then("suggestion with id {int} does not exist")
+    public void suggestionWithIdDoesNotExist(int id) {
+        Suggestion suggestion = memoryDao.getSuggestionById(id);
+        assertTrue(suggestion == null);
+    }
+    
+    @Then("suggestion with id {int} does exist")
+    public void suggestionWithIdDoesExist(int id) {
+        Suggestion suggestion = memoryDao.getSuggestionById(id);
+        assertFalse(suggestion == null);
     }
 }
