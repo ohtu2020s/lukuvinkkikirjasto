@@ -5,6 +5,8 @@
 
 [Product backlog](https://github.com/ohtu2020s/lukuvinkkikirjasto/projects/1)
 
+[Timesheet](https://docs.google.com/spreadsheets/d/1SteACe8_qmBHzrWej1TwJuCKEYG3UmCVeDvXcHhJJzQ/edit#gid=0)
+
 ## Asennus- ja käyttöohje
 
 Kloonaa repositorio koneellesi
