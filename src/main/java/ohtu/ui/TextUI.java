@@ -5,6 +5,7 @@ import ohtu.domain.BookSuggestion;
 import ohtu.domain.Suggestion;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 
 import ohtu.io.IO;
@@ -106,9 +107,24 @@ public class TextUI {
         }
     }
 
-    private void commandShow() {
+    private void commandShow() throws InterruptedException {
         for (Suggestion item : dao.getSuggestions()) {
-            System.out.println(item.toString());
+            io.println(item.toString());
+        }
+
+        io.println();
+        String input = io.prompt("Sort the items by (n)ame or (q)uit: ");
+
+        if (input.equals("q") || input == null) {
+            return;
+        }
+
+        if (input.equals("n")) {
+            dao.getSuggestions()
+                    .stream()
+                    .sorted(Comparator.comparing(Suggestion::getTitle))
+                    .map(item -> item.toString())
+                    .forEach(item -> io.println(item));
         }
     }
 

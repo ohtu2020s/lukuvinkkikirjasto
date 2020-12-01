@@ -1,4 +1,3 @@
-@broken
 Feature: kayttaja voi hakea vinkkeja
 
     Scenario: käyttäjä voi listata olemassaolevat vinkit
