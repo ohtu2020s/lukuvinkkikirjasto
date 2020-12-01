@@ -6,3 +6,6 @@ Feature: kayttaja voi hakea vinkkeja
         And   command show is selected
         Then  system will respond with line containing "title, book, author"
         And   system will respond with line containing "anotherTitle, book, anotherAuthor"
+        When  user inputs a valid character "n"
+        Then  system will respond with line containing "anotherTitle, book, anotherAuthor"
+        And   system will respond with line containing "title, book, author"
