@@ -26,4 +26,8 @@ jobs:
       run: ./gradlew jacocoTestReport
     - name: Data to codecov
       run: bash <(curl -s https://codecov.io/bash)
-
+    - name: Upload built JAR as an artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Executable JAR with dependencies
+        path: build/libs/Lukuvinkkikirjasto.jar
