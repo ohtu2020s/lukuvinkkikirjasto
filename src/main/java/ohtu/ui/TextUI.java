@@ -1,12 +1,18 @@
 package ohtu.ui;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import ohtu.Main;
-import ohtu.domain.BookSuggestion;
-import ohtu.domain.Suggestion;
+import ohtu.domain.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import ohtu.domain.PodcastSuggestion;
 
 import ohtu.io.IO;
 import ohtu.storage.NoSuchSuggestionException;
@@ -22,7 +28,7 @@ class Command {
 
     static interface Handler {
 
-        void handle() throws InterruptedException;
+        void handle() throws InterruptedException, IOException, URISyntaxException;
     }
 
     Command(String name, String description, Handler handler) {
@@ -83,48 +89,98 @@ public class TextUI {
                 io.println("Unknown command: " + input);
             } catch (InterruptedException ie) {
                 break;
+            } catch (IOException ioe) {
+                io.println("Could not open URL");
+            } catch (URISyntaxException urie) {
+                io.println("Could not open URL");
             }
         }
     }
 
     private void commandNew() throws InterruptedException {
-        String input = io.prompt("Select suggestion type (only 'book' for now): ");
+        String input = io.prompt("Select suggestion type ('book', 'podcast' or 'article'): ");
 
         if (input.equalsIgnoreCase("book")) {
+            BookSuggestion suggestion = new BookSuggestion();
             io.println("Fill in:");
 
             String title = io.prompt("  Title: ");
             String author = io.prompt("  Author: ");
             String ISBN = io.prompt("  ISBN: ");
 
-            BookSuggestion suggestion = new BookSuggestion();
-            suggestion.setIsbn(ISBN);
             suggestion.setAuthor(author);
             suggestion.setTitle(title);
+            suggestion.setIsbn(ISBN);
+            suggestion.setUrl("https://isbnsearch.org/search?s=" + ISBN);
             dao.saveSuggestion(suggestion);
+
+        } else if (input.equalsIgnoreCase("podcast")) {
+            PodcastSuggestion suggestion = new PodcastSuggestion();
+            io.println("Fill in:");
+
+            String title = io.prompt("  Title: ");
+            String author = io.prompt("  Author: ");
+            String linkUrl = io.prompt("  URL: ");
+
+            suggestion.setAuthor(author);
+            suggestion.setTitle(title);
+            suggestion.setUrl(linkUrl);
+            dao.saveSuggestion(suggestion);
+
+        } else if (input.equalsIgnoreCase("Article")) {
+            ArticleSuggestion suggestion = new ArticleSuggestion();
+            io.println("Fill in:");
+
+            String title = io.prompt("  Title: ");
+            String author = io.prompt("  Author: ");
+            String linkUrl = io.prompt("  URL: ");
+
+            suggestion.setAuthor(author);
+            suggestion.setTitle(title);
+            suggestion.setUrl(linkUrl);
+            dao.saveSuggestion(suggestion);
+
         } else {
             io.println("Unknown suggestion type: " + input);
         }
     }
 
-    private void commandShow() throws InterruptedException {
+    private void commandShow() throws InterruptedException, URISyntaxException, IOException {
         for (Suggestion item : dao.getSuggestions()) {
-            io.println(item.toString());
+            io.println(String.format("%3s", item.getId() + ": " + item.toString()));
         }
 
         io.println();
-        String input = io.prompt("Sort the items by (n)ame or (q)uit: ");
+        String input = io.prompt("Sort the items by (n)ame, (q)uit or (o)pen link : ");
 
         if (input.equals("q") || input == null) {
             return;
         }
-
         if (input.equals("n")) {
             dao.getSuggestions()
                     .stream()
                     .sorted(Comparator.comparing(Suggestion::getTitle))
-                    .map(item -> item.toString())
+                    .map(item -> String.format("%3s", item.getId() + ": " + item.toString()))
                     .forEach(item -> io.println(item));
+        }
+        if (input.equals("o")) {
+            input = io.prompt("Select a link to open by typing in it's ID: ");
+            Integer id = Integer.valueOf(input);
+
+            if (id == null) {
+                io.println("Invalid ID: " + input);
+                return;
+            }
+
+            Suggestion suggestion = dao.getSuggestionById(id);
+
+            if (suggestion.getUrl() == null) {
+                io.println("Suggestion dosn't have a URL: " + input);
+                return;
+            }
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(new URI(suggestion.getUrl()));
+            }
         }
     }
 
@@ -154,6 +210,7 @@ public class TextUI {
 
         if (input.equalsIgnoreCase("y")) {
             dao.deleteSuggestion(suggestion);
+
         }
 
     }
