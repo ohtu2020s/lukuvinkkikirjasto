@@ -109,8 +109,7 @@ public class StubIOTest {
         );
     }
 
-    //@Test
-    //toimii lokaalisti mutta ei Cl:ssä - triggeri ei jostain syystä toimi?
+    @Test
     void triggeredConditionalInputIsReceived() throws Throwable {
         StubIOTester.test(
             (io) -> {
