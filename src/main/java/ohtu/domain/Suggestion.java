@@ -43,6 +43,15 @@ public abstract class Suggestion {
    */
   @SuggestionField
   private String author;
+  
+  /**
+   * URL web address of the resource.
+   *
+   * @see #setUrl
+   * @see #getUrl
+   */
+  @SuggestionField
+  private String url;
 
   /**
    * Get the title.
@@ -86,6 +95,30 @@ public abstract class Suggestion {
    */
   public void setAuthor(String author) {
     this.author = author;
+  }
+ 
+  /**
+   * Gets the URL.
+   *
+   * @return URL address of the suggestion
+   *
+   * @see #url
+   */
+  
+  public String getUrl() {
+      return url;
+  }
+  
+   /**
+   * Sets the URL.
+   *
+   * 
+   * @param url address of the suggestion
+   *
+   * @see #url
+   */
+  public void setUrl(String url) {
+      this.url = url;
   }
 
   /**
