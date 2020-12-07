@@ -1,6 +1,7 @@
 package ohtu.domain;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * An interface for providing values for {@link Suggestion Suggestion's} fields.
@@ -20,5 +21,9 @@ public interface SuggestionDataProvider {
 
   default Optional<Integer> getInteger(String name) {
       return Optional.empty();
+  }
+
+  default Optional<List<String>> getStringList(String name) {
+    return Optional.empty();
   }
 }

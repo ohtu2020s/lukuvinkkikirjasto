@@ -1,6 +1,7 @@
 package ohtu.storage;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,12 +46,43 @@ class SuggestionFieldHashMap implements SuggestionVisitor, SuggestionDataProvide
     return Optional.empty();
   }
 
+  @Override
+  public Optional<List<String>> getStringList(String field) {
+    Object value = fields.get(field);
+
+    if (value == null || !(value instanceof ArrayList)) {
+      return Optional.empty();
+    }
+
+    ArrayList<?> list = ArrayList.class.cast(value);
+
+    if (list.size() == 0) {
+      return Optional.of(new ArrayList<>());
+    }
+
+    ArrayList<String> checked = new ArrayList<>();
+
+    for (Object entry : list) {
+      if (entry instanceof String) {
+        checked.add((String) entry);
+      } else {
+        return Optional.of(new ArrayList<>());
+      }
+    }
+
+    return Optional.of(checked);
+  }
+
   /**
    * Stores the value of a String field in the internal collection.
    */
   @Override
   public void visitString(SuggestionFieldValue<String> field) {
     fields.put(field.getName(), field.getValue());
+  }
+
+  public void visitStringList(SuggestionFieldValue<List<String>> field) {
+    fields.put(field.getName(), new ArrayList<>(field.getValue()));
   }
 }
 

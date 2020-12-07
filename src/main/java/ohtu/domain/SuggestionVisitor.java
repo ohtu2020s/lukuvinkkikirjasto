@@ -1,5 +1,6 @@
 package ohtu.domain;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
@@ -60,6 +61,15 @@ public interface SuggestionVisitor {
   default void visitInteger(SuggestionFieldValue<Integer> field) {}
 
   /**
+   * Called for each field with type {@code List<String>}.
+   */
+  default void visitStringList(SuggestionFieldValue<List<String>> field) {}
+
+  default void visitListField(SuggestionFieldValue<List> field) {
+    visitStringList(SuggestionFieldValue.class.cast(field));
+  }
+
+  /**
    * Called for each field.
    *
    * Default implementation determines the underlying type of the field and
@@ -70,6 +80,7 @@ public interface SuggestionVisitor {
 
     handlers.add(new VisitorHandler<>(String.class, this::visitString));
     handlers.add(new VisitorHandler<>(Integer.class, this::visitInteger));
+    handlers.add(new VisitorHandler<>(List.class, this::visitListField));
 
     for (VisitorHandler<?> handler : handlers) {
       if (handler.tryHandle(field)) {

@@ -20,6 +20,8 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
         sugg.setAuthor("David Foster Wallace");
         sugg.setIsbn("9780316920049");
         sugg.setUrl("URL..//123");
+        sugg.addTag("tag1");
+        sugg.addTag("tag2");
         return sugg;
     }
 
@@ -49,6 +51,7 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
 
         assertEquals(sugg.getTitle(), retrieved.getTitle());
         assertEquals(sugg.getAuthor(), retrieved.getAuthor());
+        assertEquals(sugg.getTags(), retrieved.getTags());
     }
 
     @Test

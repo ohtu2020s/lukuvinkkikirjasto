@@ -1,6 +1,7 @@
 package ohtu.domain;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Represents a field of a {@link Suggestion} instance on runtime.
@@ -144,6 +145,11 @@ public class SuggestionFieldValue<T extends Object> {
       @Override
       public void visitInteger(SuggestionFieldValue<Integer> field) {
         dataProvider.getInteger(field.getName()).ifPresent(field::setValue);
+      }
+
+      @Override
+      public void visitStringList(SuggestionFieldValue<List<String>> field) {
+        dataProvider.getStringList(field.getName()).ifPresent(field::setValue);
       }
     }).visit(this);
   }

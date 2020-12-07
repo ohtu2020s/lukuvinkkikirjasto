@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import ohtu.domain.Suggestion;
 import ohtu.domain.SuggestionFactory;
@@ -61,6 +62,22 @@ abstract class SerializingVisitor implements SuggestionVisitor {
   @Override
   public void visitInteger(SuggestionFieldValue<Integer> field) {
     visitSerializedField(field.getName(), field.getValue().toString());
+  }
+
+  private static String quote(String value) {
+    return String.format(
+      "\"%s\"",
+      value.replaceAll("\\\\", "\\\\").replaceAll("\"", "\\\"")
+    );
+  }
+
+  @Override
+  public void visitStringList(SuggestionFieldValue<List<String>> field) {
+    String serialized = field.getValue().stream()
+      .map(SerializingVisitor::quote)
+      .collect(Collectors.joining(","));
+
+    visitSerializedField(field.getName(), serialized);
   }
 }
 
@@ -144,13 +161,58 @@ class StringDataProvider implements SuggestionDataProvider {
    *
    * If no value for the specified field is stored, returns an empty optional.
    */
+  @Override
   public Optional<String> getString(String name) {
     return Optional.ofNullable(fields.get(name));
   }
 
+  @Override
   public Optional<Integer> getInteger(String name) {
     return Optional.ofNullable(fields.get(name))
       .map(Integer::valueOf);
+  }
+  
+  @Override
+  public Optional<List<String>> getStringList(String name) {
+    String value = fields.get(name);
+
+    if (value == null) {
+      return Optional.empty();
+    }
+
+    ArrayList<String> list = new ArrayList<>();
+    StringBuilder sb = new StringBuilder();
+    boolean parsingValue = false;
+    boolean escaped = false;
+
+    for (int i = 0; i < value.length(); i++) {
+      char ch = value.charAt(i);
+
+      if (escaped) {
+        escaped = false;
+        sb.append(ch);
+        continue;
+      }
+
+      if (ch == '\\') {
+        escaped = true;
+        continue;
+      }
+
+      if (ch == '"') {
+        if (parsingValue) {
+          list.add(sb.toString());
+        }
+
+        sb = new StringBuilder();
+        parsingValue = !parsingValue;
+        continue;
+      }
+
+      sb.append(ch);
+    }
+
+    return Optional.of(list);
   }
 }
 

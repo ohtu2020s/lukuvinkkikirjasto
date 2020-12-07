@@ -53,6 +53,9 @@ public abstract class Suggestion {
   @SuggestionField
   private String url;
 
+  @SuggestionField
+  private ArrayList<String> tags = new ArrayList<>();
+
   /**
    * Get the title.
    *
@@ -141,6 +144,36 @@ public abstract class Suggestion {
    */
   public void setId(int id) {
     this.identifier = id;
+  }
+
+  /**
+   * Gets a set containing all tags associated with this suggestion.
+   *
+   * Returns a <i>new</i> set containing the tags.
+   * Operations on this returned set do not affect the internal list of tags.
+   *
+   * @return A new set containing the tags.
+   */
+  public Set<String> getTags() {
+    return new HashSet<>(tags);
+  }
+
+  /**
+   * Associates a new tag with this suggestion.
+   *
+   * Does nothing if the given tag is already associated with this suggestion.
+   */
+  public void addTag(String tag) {
+    if (!tags.contains(tag)) {
+      tags.add(tag);
+    }
+  }
+
+  /**
+   * Removes a tag from being associated with this suggestion.
+   */
+  public void removeTag(String tag) {
+    tags.remove(tag);
   }
 
   /**
