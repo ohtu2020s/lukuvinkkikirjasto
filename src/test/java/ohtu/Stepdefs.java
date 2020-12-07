@@ -106,6 +106,11 @@ public class Stepdefs {
     public void userInputsANewISBN(String isbn) {
         io.trigger("ISBN:", isbn);
     }
+  
+    @When("user inputs a new url {string}")
+    public void userInputsANewURL(String url) {
+        io.trigger("Url:", url);
+    }
 
     @When("user leaves the title unmodified")
     public void userLeavesTheTitleUnmodified() {
@@ -120,6 +125,11 @@ public class Stepdefs {
     @When("user leaves the isbn unmodified")
     public void userLeavesTheISBNUnmodified() {
         io.trigger("ISBN:", null);
+    }
+    
+    @When("user leaves the url unmodified")
+    public void userLeavesTheURLUnmodified() {
+        io.trigger("Url:", null);
     }
 
     @Then("system will respond with line {string}")

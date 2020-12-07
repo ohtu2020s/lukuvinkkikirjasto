@@ -19,6 +19,7 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
         sugg.setTitle("Infinite Jest");
         sugg.setAuthor("David Foster Wallace");
         sugg.setIsbn("9780316920049");
+        sugg.setUrl("URL..//123");
         return sugg;
     }
 
@@ -156,6 +157,7 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
         suggToStay.setTitle("New Title");
         suggToStay.setAuthor("New Author");
         suggToStay.setIsbn("New Isbn");
+        suggToStay.setUrl("New URL");
         dao.saveSuggestion(suggToStay);
         
         dao.deleteSuggestion(suggToBeDeleted);
