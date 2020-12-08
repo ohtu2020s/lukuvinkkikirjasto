@@ -74,6 +74,7 @@ public class StubIO implements IO {
      * Special value used to message that a channel has been closed.
      */
     private static String channelClosureSentinel = "<CHANNEL_CLOSED>";
+    private static String blockingOnInputMarker = "<BLOCKING_ON_INPUT>";
 
     private volatile boolean outChannelClosed = false;
 
@@ -84,7 +85,7 @@ public class StubIO implements IO {
      * and the input itself, in this order. Entries are removed from this
      * after they have been triggered.
      */
-    private ArrayList<Pair<String, String>> triggers = new ArrayList<>();
+    private volatile ArrayList<Pair<String, String>> triggers = new ArrayList<>();
 
     /**
      * Special value denoting that the default input value should be used
@@ -137,6 +138,7 @@ public class StubIO implements IO {
 
     @Override
     public String nextString() throws InterruptedException {
+        outChannel.put(blockingOnInputMarker);
         return inChannel.take();
     }
 
@@ -192,13 +194,25 @@ public class StubIO implements IO {
      * {@code false} if exeuction was terminated due to some other reason.
      */
     public boolean runUntil(Function<String, Boolean> predicate) {
-        while (true) {
+        while (!outChannelClosed) {
             String output = outChannel.poll();
 
-            outChannelClosed |= output == channelClosureSentinel;
-
-            if (outChannelClosed) {
+            if (output == channelClosureSentinel) {
+                outChannelClosed = true;
                 return false;
+            }
+
+            if (output == blockingOnInputMarker) {
+                String input = inQueue.pollFirst();
+
+                if (input != null) {
+                    try {
+                        inChannel.transfer(input);
+                    } catch (InterruptedException ie) {
+                    }
+                } else {
+                    return false;
+                }
             }
 
             if (output != null) {
@@ -210,21 +224,9 @@ public class StubIO implements IO {
 
                 continue;
             }
-
-            if (inChannel.hasWaitingConsumer()) {
-                try {
-                    String input = inQueue.pollFirst();
-
-                    if (input != null) {
-                        inChannel.transfer(input);
-                    } else if (outChannel.isEmpty()) {
-                        return false;
-                    }
-                } catch (InterruptedException ie) {
-                    return false;
-                }
-            }
         }
+
+        return false;
     }
 
     /**
