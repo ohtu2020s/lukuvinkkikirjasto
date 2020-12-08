@@ -162,40 +162,60 @@ public class TextUI {
         }
     }
 
-    private void printSuggestionList() {
-        for (Suggestion item : dao.getSuggestions()) {
-            String tags = item.getTags()
-                .stream()
-                .map(tag -> "[" + tag + "]")
-                .collect(Collectors.joining(" "));
+    private void printSuggestionListItem(Suggestion item) {
+        String tags = item.getTags()
+            .stream()
+            .map(tag -> "[" + tag + "]")
+            .collect(Collectors.joining(" "));
 
-            io.println(String.format(
-                "%3s %s %s",
-                item.getId() + ":",
-                item.toString(),
-                tags
-            ));
-        }
+        io.println(String.format(
+            "%3s %s %s",
+            item.getId() + ":",
+            item.toString(),
+            tags
+        ));
+    } 
+
+    private void printSuggestionList() {
+        dao.getSuggestions()
+            .stream()
+            .forEach(this::printSuggestionListItem);
     }
 
     private void commandShow() throws InterruptedException, URISyntaxException, IOException {
         printSuggestionList();
         io.println();
-        String input = io.prompt("Sort the items by (n)ame, (q)uit or (o)pen link : ");
+        io.println("Sort the items by (n)ame, filter by (t)ag, (q)uit or (o)pen link");
 
-        if (input.equals("q") || input == null) {
+        char input = 0;
+
+        while ("qnto".indexOf(input) == -1) {
+            input = Character.toLowerCase(io.nextChar());
+        }
+
+        if (input == 'w') {
             return;
         }
-        if (input.equals("n")) {
+
+        if (input == 'n') {
             dao.getSuggestions()
                     .stream()
                     .sorted(Comparator.comparing(Suggestion::getTitle))
-                    .map(item -> String.format("%3s", item.getId() + ": " + item.toString()))
-                    .forEach(item -> io.println(item));
+                    .forEach(this::printSuggestionListItem);
         }
-        if (input.equals("o")) {
-            input = io.prompt("Select a link to open by typing in it's ID: ");
-            Integer id = Integer.valueOf(input);
+
+        if (input == 't') {
+            String tag = io.prompt("Filter by tag: ");
+
+            dao.getSuggestions()
+                .stream()
+                .filter(suggestion -> suggestion.getTags().contains(tag))
+                .forEach(this::printSuggestionListItem);
+        }
+
+        if (input == 'o') {
+            String idString = io.prompt("Select a link to open by typing in it's ID: ");
+            Integer id = Integer.valueOf(idString);
 
             if (id == null) {
                 io.println("Invalid ID: " + input);
