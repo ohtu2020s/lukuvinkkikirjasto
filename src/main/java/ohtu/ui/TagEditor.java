@@ -66,8 +66,13 @@ public class TagEditor {
         printIndent();
         String value = io.prompt("» ");
         linesSinceStart++;
-        list.add(value);
-        set.add(value);
+
+        if (!set.contains(value)) {
+          list.add(value);
+          set.add(value);
+        } else {
+          focusedIndex = list.indexOf(value);
+        }
     }
 
     private void handleRemove() {
