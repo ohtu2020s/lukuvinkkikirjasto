@@ -71,6 +71,13 @@ public class StubIO implements IO {
     private ArrayDeque<String> inQueue = new ArrayDeque<>();
 
     /**
+     * Special value used to message that a channel has been closed.
+     */
+    private static String channelClosureSentinel = "<CHANNEL_CLOSED>";
+
+    private volatile boolean outChannelClosed = false;
+
+    /**
      * List of conditional inputs.
      *
      * Each pair consists of the output fragment required to trigger the input
@@ -78,9 +85,6 @@ public class StubIO implements IO {
      * after they have been triggered.
      */
     private ArrayList<Pair<String, String>> triggers = new ArrayList<>();
-
-    private volatile boolean inputClosed = false;
-    private volatile boolean outputClosed = false;
 
     /**
      * Special value denoting that the default input value should be used
@@ -133,10 +137,6 @@ public class StubIO implements IO {
 
     @Override
     public String nextString() throws InterruptedException {
-        if (inputClosed) {
-            throw new InterruptedException("controlling side has closed input");
-        }
-
         return inChannel.take();
     }
 
@@ -195,6 +195,12 @@ public class StubIO implements IO {
         while (true) {
             String output = outChannel.poll();
 
+            outChannelClosed |= output == channelClosureSentinel;
+
+            if (outChannelClosed) {
+                return false;
+            }
+
             if (output != null) {
                 handleOutput(output);
 
@@ -203,10 +209,6 @@ public class StubIO implements IO {
                 }
 
                 continue;
-            }
-
-            if (outputClosed) {
-                return false;
             }
 
             if (inChannel.hasWaitingConsumer()) {
@@ -234,19 +236,14 @@ public class StubIO implements IO {
     }
 
     /**
-     * Marks the input stream as closed.
-     * Causes any further read operations to throw an
-     * {@code InterruptedException} instead of blocking.
-     */
-    public void closeInput() {
-        inputClosed = true;
-    }
-
-    /**
      * Marks the output stream as closed.
      * Causes any operations waiting for futher output to terminate.
      */
     public void closeOutput() {
-        outputClosed = true;
+        try {
+            outChannel.put(channelClosureSentinel);
+        } catch (InterruptedException ie) {
+            return;
+        }
     }
 }

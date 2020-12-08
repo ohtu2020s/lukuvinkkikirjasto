@@ -31,11 +31,7 @@ class StubIOTester {
     public void test() throws Throwable {
         uiThread.start();
 
-        try {
-            controllingThreadExecutor.execute(io);
-        } finally {
-            io.closeInput();
-        }
+        controllingThreadExecutor.execute(io);
 
         if (uiThrowable.isPresent()) {
             throw uiThrowable.get();
@@ -137,6 +133,21 @@ public class StubIOTest {
             (io) -> {
                 String defaultInput = "Default Input";
                 assertEquals(defaultInput, io.prompt("> ", defaultInput));
+            }
+        );
+    }
+
+    @Test
+    void requestingInputAfterInputChannelHasClosedThrows() throws Throwable {
+        StubIOTester.test(
+            (io) -> {
+                io.input("Line #1");
+                io.input("Line #2");
+            },
+            (io) -> {
+                assertEquals("Line #1", io.nextString());
+                assertEquals("Line #2", io.nextString());
+                assertThrows(InterruptedException.class, io::nextString);
             }
         );
     }
