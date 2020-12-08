@@ -9,6 +9,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.Attributes;
 
 /**
  *
@@ -17,6 +18,7 @@ import org.jline.terminal.TerminalBuilder;
 public class ConsoleIO implements IO {
     private Scanner lukija;
     private LineReader lineReader;
+    private Terminal terminal;
 
     private PrintStream out;
 
@@ -25,19 +27,32 @@ public class ConsoleIO implements IO {
         out = System.out;
 
         lineReader = LineReaderBuilder.builder().build();
+        terminal = lineReader.getTerminal();
     }
 
     ConsoleIO(InputStream in, PrintStream out) throws IOException {
         lukija = new Scanner(in);
         this.out = out;
 
-        Terminal terminal = TerminalBuilder.builder()
+        terminal = TerminalBuilder.builder()
             .streams(in, out)
             .build();
 
         lineReader = LineReaderBuilder.builder()
             .terminal(terminal)
             .build();
+    }
+
+    public char nextChar() {
+        Attributes attrs = terminal.enterRawMode();
+
+        try {
+            return (char) terminal.reader().read();
+        } catch (IOException ioe) {
+            return 0;
+        } finally {
+            terminal.setAttributes(attrs);
+        }
     }
 
     public String nextString() {

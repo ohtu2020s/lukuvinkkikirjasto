@@ -8,10 +8,14 @@ import ohtu.Main;
 import ohtu.domain.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.function.Consumer;
 import ohtu.domain.PodcastSuggestion;
 
 import ohtu.io.IO;
@@ -97,59 +101,85 @@ public class TextUI {
         }
     }
 
+    private void promptCommonFields(Suggestion suggestion) throws InterruptedException {
+    }
+
+    private interface InterruptableCallback {
+        void call() throws InterruptedException;
+    }
+
+    private void wrapWithCommonFieldPrompts(Suggestion suggestion, InterruptableCallback cb) throws InterruptedException {
+        io.println("Fill in:");
+        String title = io.prompt("  Title: ");
+        String author = io.prompt("  Author: ");
+        suggestion.setAuthor(author);
+        suggestion.setTitle(title);
+
+        cb.call();
+
+        io.println("  Tags: ([A]dd, [R]emove, [C]ontinue, arrow keys navigate)");
+        HashSet<String> tags = new HashSet<>();
+        TagEditor editor = new TagEditor(io, tags);
+        editor.setIndent(4);
+        editor.run();
+        suggestion.setTags(tags);
+    }
+
     private void commandNew() throws InterruptedException {
         String input = io.prompt("Select suggestion type ('book', 'podcast' or 'article'): ");
 
         if (input.equalsIgnoreCase("book")) {
             BookSuggestion suggestion = new BookSuggestion();
-            io.println("Fill in:");
 
-            String title = io.prompt("  Title: ");
-            String author = io.prompt("  Author: ");
-            String ISBN = io.prompt("  ISBN: ");
+            wrapWithCommonFieldPrompts(suggestion, () -> {
+                String ISBN = io.prompt("  ISBN: ");
+                suggestion.setIsbn(ISBN);
+                suggestion.setUrl("https://isbnsearch.org/search?s=" + ISBN);
+            });
 
-            suggestion.setAuthor(author);
-            suggestion.setTitle(title);
-            suggestion.setIsbn(ISBN);
-            suggestion.setUrl("https://isbnsearch.org/search?s=" + ISBN);
             dao.saveSuggestion(suggestion);
 
         } else if (input.equalsIgnoreCase("podcast")) {
             PodcastSuggestion suggestion = new PodcastSuggestion();
-            io.println("Fill in:");
 
-            String title = io.prompt("  Title: ");
-            String author = io.prompt("  Author: ");
-            String linkUrl = io.prompt("  URL: ");
+            wrapWithCommonFieldPrompts(suggestion, () -> {
+                String linkUrl = io.prompt("  URL: ");
+                suggestion.setUrl(linkUrl);
+            });
 
-            suggestion.setAuthor(author);
-            suggestion.setTitle(title);
-            suggestion.setUrl(linkUrl);
             dao.saveSuggestion(suggestion);
-
         } else if (input.equalsIgnoreCase("Article")) {
             ArticleSuggestion suggestion = new ArticleSuggestion();
-            io.println("Fill in:");
 
-            String title = io.prompt("  Title: ");
-            String author = io.prompt("  Author: ");
-            String linkUrl = io.prompt("  URL: ");
+            wrapWithCommonFieldPrompts(suggestion, () -> {
+                String linkUrl = io.prompt("  URL: ");
+                suggestion.setUrl(linkUrl);
+            });
 
-            suggestion.setAuthor(author);
-            suggestion.setTitle(title);
-            suggestion.setUrl(linkUrl);
             dao.saveSuggestion(suggestion);
-
         } else {
             io.println("Unknown suggestion type: " + input);
         }
     }
 
-    private void commandShow() throws InterruptedException, URISyntaxException, IOException {
+    private void printSuggestionList() {
         for (Suggestion item : dao.getSuggestions()) {
-            io.println(String.format("%3s", item.getId() + ": " + item.toString()));
-        }
+            String tags = item.getTags()
+                .stream()
+                .map(tag -> "[" + tag + "]")
+                .collect(Collectors.joining(" "));
 
+            io.println(String.format(
+                "%3s %s %s",
+                item.getId() + ":",
+                item.toString(),
+                tags
+            ));
+        }
+    }
+
+    private void commandShow() throws InterruptedException, URISyntaxException, IOException {
+        printSuggestionList();
         io.println();
         String input = io.prompt("Sort the items by (n)ame, (q)uit or (o)pen link : ");
 
@@ -185,11 +215,9 @@ public class TextUI {
     }
 
     private void commandDelete() throws InterruptedException {
-        for (Suggestion item : dao.getSuggestions()) {
-            io.println(String.format("%3s [%s] %s", item.getId() + ":", item.getKind(), item.getTitle()));
-        }
-
+        printSuggestionList();
         io.println();
+
         String input = io.prompt("Select an item from the above list to DELETE by typing in it's ID: ");
 
         Integer id = Integer.valueOf(input);
@@ -228,6 +256,27 @@ public class TextUI {
             try {
                 String newValue = io.prompt("  " + field.getDisplayName() + ": ", field.getValue());
                 field.setValue(newValue);
+            } catch (InterruptedException ie) {
+                interrupt = Optional.of(ie);
+            }
+        }
+
+        @Override
+        public void visitStringList(SuggestionFieldValue<List<String>> field) {
+            if (interrupt.isPresent()) {
+                return;
+            }
+
+            io.println("  " + field.getDisplayName() + ": ([A]dd, [R]emove, [C]ontinue, arrow keys navigate)");
+
+            try {
+                HashSet<String> set = new HashSet<>(field.getValue());
+
+                TagEditor editor = new TagEditor(io, set);
+                editor.setIndent(4);
+                editor.run();
+
+                field.setValue(new ArrayList<>(set));
             } catch (InterruptedException ie) {
                 interrupt = Optional.of(ie);
             }

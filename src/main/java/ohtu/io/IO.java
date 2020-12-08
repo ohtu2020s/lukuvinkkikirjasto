@@ -8,6 +8,7 @@ public interface IO {
     void print(String m);
 
     String nextString() throws InterruptedException;
+    char nextChar() throws InterruptedException;
     String prompt(String prompt) throws InterruptedException;
     String prompt(String prompt, String defaultValue) throws InterruptedException;
 

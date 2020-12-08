@@ -176,6 +176,10 @@ public abstract class Suggestion {
     tags.remove(tag);
   }
 
+  public void setTags(Set<String> ptags) {
+    tags = new ArrayList<String>(ptags);
+  }
+
   /**
    * Calls the appropriate methods for each field of this suggestion instance.
    *

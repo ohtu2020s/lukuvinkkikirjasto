@@ -16,7 +16,7 @@ import org.reflections.Reflections;
  * {@link #create(String)} and {@link #create(String, SuggestionDataProvider)}
  * can be used.
  */
-public class SuggestionFactory {
+public class SuggestionFactory<T extends Suggestion> {
     /**
      * List of all subclasses of {@link Suggestion} with the {@link SuggestionKind}
      * annotation. Accessed using the {@link #getSuggestionClasses} method, which
@@ -27,12 +27,12 @@ public class SuggestionFactory {
     /**
      * The specific {@link Suggestion} subclass associated with this instance.
      */
-    private Class<? extends Suggestion> suggestionClass;
+    private Class<T> suggestionClass;
 
     /**
      * Creates an factory instance from the specified subclass of {@link Suggestion}.
      */
-    private SuggestionFactory(Class<? extends Suggestion> suggestionClass) {
+    private SuggestionFactory(Class<T> suggestionClass) {
         this.suggestionClass = suggestionClass;
     }
 
@@ -69,9 +69,9 @@ public class SuggestionFactory {
      * @return A factory instance which can be used to construct instances of
      *   the {@link Suggestion} subclass associate with the given {@code kind}.
      */
-    public static SuggestionFactory getFactory(String kind) {
+    public static SuggestionFactory<?> getFactory(String kind) {
         Class<? extends Suggestion> suggestionClass = getSuggestionClasses().get(kind);
-        return new SuggestionFactory(suggestionClass);
+        return new SuggestionFactory<>(suggestionClass);
     }
 
     /**
@@ -79,11 +79,11 @@ public class SuggestionFactory {
      *
      * @return List containing a factory for each known suggestion kind.
      */
-    public static List<SuggestionFactory> getFactories() {
+    public static List<SuggestionFactory<?>> getFactories() {
         return getSuggestionClasses()
             .values()
             .stream()
-            .map(cls -> new SuggestionFactory(cls))
+            .map(cls -> new SuggestionFactory<>(cls))
             .collect(Collectors.toList());
     }
 
@@ -107,7 +107,7 @@ public class SuggestionFactory {
      *
      * @return A new {@link Suggestion} instance.
      */
-    public Suggestion create() {
+    public T create() {
         try {
             return suggestionClass.getConstructor().newInstance();
         } catch (Exception exception) {
@@ -124,8 +124,8 @@ public class SuggestionFactory {
      *
      * @return A new {@link Suggestion} instance.
      */
-    public Suggestion create(SuggestionDataProvider data) {
-        Suggestion instance = create();
+    public T create(SuggestionDataProvider data) {
+        T instance = create();
         instance.populate(data);
         return instance;
     }

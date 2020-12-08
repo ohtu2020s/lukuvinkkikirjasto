@@ -127,6 +127,11 @@ public class StubIO implements IO {
     }
 
     @Override
+    public char nextChar() throws InterruptedException {
+        return nextString().charAt(0);
+    }
+
+    @Override
     public String nextString() throws InterruptedException {
         if (inputClosed) {
             throw new InterruptedException("controlling side has closed input");
