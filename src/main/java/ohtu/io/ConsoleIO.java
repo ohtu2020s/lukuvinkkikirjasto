@@ -35,6 +35,7 @@ public class ConsoleIO implements IO {
         this.out = out;
 
         terminal = TerminalBuilder.builder()
+            .jansi(true)
             .streams(in, out)
             .build();
 
@@ -56,7 +57,7 @@ public class ConsoleIO implements IO {
     }
 
     public String nextString() {
-        return lukija.nextLine();
+        return lineReader.readLine();
     }
 
     public void print(String m) {
