@@ -26,8 +26,18 @@ public class ConsoleIO implements IO {
         lukija = new Scanner(System.in);
         out = System.out;
 
-        lineReader = LineReaderBuilder.builder().build();
-        terminal = lineReader.getTerminal();
+        try {
+            terminal = TerminalBuilder.builder()
+                    .system(true)
+                    .build();
+
+            lineReader = LineReaderBuilder.builder()
+                    .terminal(terminal)
+                    .build();
+        } catch (IOException ioe) {
+            lineReader = LineReaderBuilder.builder().build();
+            terminal = lineReader.getTerminal();
+        }
     }
 
     ConsoleIO(InputStream in, PrintStream out) throws IOException {
@@ -61,7 +71,8 @@ public class ConsoleIO implements IO {
     }
 
     public void print(String m) {
-        out.print(m);
+        terminal.writer().print(m);
+        terminal.writer().flush();
     }
 
     public String prompt(String prompt) {
