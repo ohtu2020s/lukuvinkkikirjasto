@@ -12,10 +12,12 @@ Feature: käyttäjä voi muokata olemassaolevaa vinkkiä
         Given new book suggestion is created with title "title", author "author" and isbn "isbn"
         And   command edit is selected
         When  user inputs a valid suggestion id 0
+        And   user inputs a new isbn "new isbn"
         And   user inputs a new title "new title"
         And   user inputs a new author "new author"
-        And   user inputs a new isbn "new isbn"
+        And   user inputs a new comment "new comment"
         And   user inputs a new url "new url"
+        And   user inputs character "C" to continue
         Then  system will show the command prompt
         And   field "title" of suggestion 0 has value of "new title"
         And   field "author" of suggestion 0 has value of "new author"
@@ -26,10 +28,12 @@ Feature: käyttäjä voi muokata olemassaolevaa vinkkiä
         Given new book suggestion is created with title "title", author "author" and isbn "isbn"
         And   command edit is selected
         When  user inputs a valid suggestion id 0
+        And   user leaves the isbn unmodified
         And   user leaves the title unmodified
         And   user leaves the author unmodified
-        And   user leaves the isbn unmodified
+        And   user leaves the comment unmodified
         And   user leaves the url unmodified
+        And   user inputs character "C" to continue
         Then  system will show the command prompt
         And   field "title" of suggestion 0 has value of "title"
         And   field "author" of suggestion 0 has value of "author"

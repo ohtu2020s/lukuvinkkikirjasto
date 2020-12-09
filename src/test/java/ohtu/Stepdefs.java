@@ -111,6 +111,14 @@ public class Stepdefs {
     public void userInputsANewURL(String url) {
         io.trigger("Url:", url);
     }
+    @When("user inputs character {string} to continue")
+    public void userInputsCharacterC(String input) {
+        io.trigger("Tags:", input);
+    }
+    @When("user inputs a new comment {string}")
+    public void userInputsANewComment(String input) {
+        io.trigger("Comment:", input);
+    }
 
     @When("user leaves the title unmodified")
     public void userLeavesTheTitleUnmodified() {
@@ -131,6 +139,10 @@ public class Stepdefs {
     public void userLeavesTheURLUnmodified() {
         io.trigger("Url:", null);
     }
+    @When("user leaves the comment unmodified")
+    public void userLeavesTheCommentUnmodified() {
+        io.trigger("Comment:", null);
+    }
 
     @Then("system will respond with line {string}")
     public void systemWillRespondWith(String expectedOutput) {
@@ -147,12 +159,13 @@ public class Stepdefs {
         assertTrue(io.runUntil(line -> line.equals("> ")));
     }
 
-    @Then("suggestion can be found from database with title {string}, author {string} and isbn {string}")
-    public void suggestionIsSavedToDatabase(String title, String author, String isbn) {
+    @Then("suggestion can be found from database with title {string}, author {string}, isbn {string} and comment {string}")
+    public void suggestionIsSavedToDatabase(String title, String author, String isbn, String comment) {
         systemWillShowTheCommandPrompt();
         fieldOfSuggestionHasValueOf("title", 0, title);
         fieldOfSuggestionHasValueOf("author", 0, author);
         fieldOfSuggestionHasValueOf("isbn", 0, isbn);
+        fieldOfSuggestionHasValueOf("comment", 0, comment);
     }
 
     @Then("field {string} of suggestion {int} has value of {string}")

@@ -31,7 +31,8 @@ public class BookSuggestionTest {
     BookSuggestion suggestion = new BookSuggestion();
     suggestion.setTitle("Title");
     suggestion.setAuthor("Author");
-    assertEquals("Title, book, Author", suggestion.toString());
+    suggestion.setComment("Comment");
+    assertEquals("Title, book, Author, Comment", suggestion.toString());
   }
 
   @Nested

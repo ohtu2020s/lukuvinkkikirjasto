@@ -5,10 +5,12 @@ Feature: kayttaja voi luoda uuden vinkin
         When  user inputs a valid suggestion type "book"
         And   user inputs a new title "LOTR"
         And   user inputs a new author "TOLKIEN"
+        And   user inputs a new comment "recommended by friend"
         And   user inputs a new isbn "9780544003415"
-        Then  suggestion can be found from database with title "LOTR", author "TOLKIEN" and isbn "9780544003415"
+        And   user inputs character "C" to continue
+        Then  suggestion can be found from database with title "LOTR", author "TOLKIEN", isbn "9780544003415" and comment "recommended by friend"
   
-    Scenario: käyttäjä valitsee olemattoman vinkkityypin
+    Scenario: käyttäjä saa virheilmoituksen valitessaan olemattoman vinkkityypin
        Given command new is selected
        When  user inputs invalid suggestion type "suggestionThatDoesntExist"
        Then  system will respond with line containing "Unknown suggestion type: suggestionThatDoesntExist"

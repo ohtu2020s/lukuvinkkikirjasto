@@ -36,7 +36,7 @@ public class SuggestionTest {
       }
     });
 
-    assertEquals(5, visited[0]);
+    assertEquals(6, visited[0]);
   }
 
   @Test
