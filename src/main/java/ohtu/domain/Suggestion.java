@@ -27,6 +27,15 @@ public abstract class Suggestion {
   private int identifier;
 
   /**
+   * Comment of the suggestion.
+   * 
+   * @see #setComment
+   * @see #getComment
+   */
+  @SuggestionField
+  private String comment;
+
+  /**
    * Title or name of the suggested content.
    *
    * @see #setTitle
@@ -144,6 +153,14 @@ public abstract class Suggestion {
    */
   public void setId(int id) {
     this.identifier = id;
+  }
+  
+  public void setComment(String comment) {
+      this.comment = comment;
+  }
+  
+  public String getComment() {
+      return this.comment;
   }
 
   /**
