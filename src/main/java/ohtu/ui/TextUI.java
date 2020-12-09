@@ -124,8 +124,10 @@ public class TextUI {
         io.println("Fill in:");
         String title = io.prompt("  Title: ");
         String author = io.prompt("  Author: ");
+        String comment = io.prompt("  Comment: ");
         suggestion.setAuthor(author);
         suggestion.setTitle(title);
+        suggestion.setComment(comment);
 
         cb.call();
 
@@ -225,6 +227,7 @@ public class TextUI {
 
         if (input == 'o') {
             String idString = io.prompt("Select a link to open by typing in it's ID: ");
+            
             Integer id = Integer.valueOf(idString);
 
             if (id == null) {
