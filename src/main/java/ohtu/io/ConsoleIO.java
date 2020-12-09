@@ -16,16 +16,10 @@ import org.jline.terminal.Attributes;
  *
  */
 public class ConsoleIO implements IO {
-    private Scanner lukija;
     private LineReader lineReader;
     private Terminal terminal;
 
-    private PrintStream out;
-
     public ConsoleIO() {
-        lukija = new Scanner(System.in);
-        out = System.out;
-
         try {
             terminal = TerminalBuilder.builder()
                     .system(true)
@@ -41,17 +35,18 @@ public class ConsoleIO implements IO {
     }
 
     ConsoleIO(InputStream in, PrintStream out) throws IOException {
-        lukija = new Scanner(in);
-        this.out = out;
-
         terminal = TerminalBuilder.builder()
-            .jansi(true)
             .streams(in, out)
             .build();
 
         lineReader = LineReaderBuilder.builder()
             .terminal(terminal)
             .build();
+    }
+
+    @Override
+    public boolean hasUtf8Support() {
+      return !terminal.getType().startsWith("dumb");
     }
 
     public char nextChar() {
@@ -71,7 +66,13 @@ public class ConsoleIO implements IO {
     }
 
     public void print(String m) {
+        System.out.println("Printing: " +m);
         terminal.writer().print(m);
+        terminal.writer().flush();
+    }
+
+    public void println(String m) {
+        terminal.writer().println(m);
         terminal.writer().flush();
     }
 

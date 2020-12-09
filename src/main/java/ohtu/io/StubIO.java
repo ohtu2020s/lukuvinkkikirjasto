@@ -132,6 +132,11 @@ public class StubIO implements IO {
     }
 
     @Override
+    public boolean hasUtf8Support() {
+      return true;
+    }
+
+    @Override
     public char nextChar() throws InterruptedException {
         return nextString().charAt(0);
     }

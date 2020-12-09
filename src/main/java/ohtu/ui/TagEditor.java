@@ -14,11 +14,34 @@ public class TagEditor {
     private int focusedIndex = 0;
     private IO io;
     private String indent = "";
+    private String normalBullet = "•";
+    private String focusedBullet = "›";
+    private String editingBullet = "»";
+
+    private static class Style {
+      String normal;
+      String focused;
+      String editing;
+
+      Style(String normal, String focused, String editing) {
+        this.normal = normal;
+        this.focused = focused;
+        this.editing = editing;
+      }
+    }
+
+    public static Style normalStyle = new Style("•", "›", "»");
+    public static Style simpleStyle = new Style("*", ">", ":");
+    private Style style = normalStyle;
 
     TagEditor(IO io, Set<String> tags) {
         this.io = io;
         this.set = tags;
         this.list = new ArrayList<>(tags);
+    }
+
+    public void setStyle(Style style) {
+      this.style = style;
     }
 
     private void println(String line) {
@@ -28,12 +51,7 @@ public class TagEditor {
 
     private void printList() {
         for (int i = 0; i < list.size(); i++) {
-            String bullet = "•";
-
-            if (i == focusedIndex) {
-                bullet = "›";
-            }
-
+            String bullet = i == focusedIndex ? style.focused : style.normal;
             println(bullet + " " + list.get(i));
         }
     }
@@ -64,7 +82,7 @@ public class TagEditor {
         clear();
         printList();
         printIndent();
-        String value = io.prompt("» ");
+        String value = io.prompt(style.editing + " ");
         linesSinceStart++;
 
         if (!set.contains(value)) {

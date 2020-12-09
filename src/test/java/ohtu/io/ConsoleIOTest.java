@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class ConsoleIOTest {
     // NOTE(dogamak):
@@ -19,6 +21,7 @@ public class ConsoleIOTest {
     PrintStream out;
     AppendableByteArrayInputStream in;
     ConsoleIO io;
+    String newline = "\r\n";
 
     static class AppendableByteArrayInputStream extends InputStream {
         private ArrayDeque<Byte> array = new ArrayDeque<>();
@@ -33,8 +36,9 @@ public class ConsoleIOTest {
         }
 
         public void appendString(String str) {
-            for (byte b : str.getBytes())
+            for (byte b : str.getBytes()) {
                 array.add(b);
+            }
         }
     }
 
@@ -51,56 +55,56 @@ public class ConsoleIOTest {
     void printPrintsTheLine() {
         io.print("Line!");
         assertTrue(os.toString().contains("Line!"));
-        assertFalse(os.toString().contains("Line!\n"));
+        assertFalse(os.toString().contains("Line!" + newline));
     }
 
     @Test
     void printlnPrintsTheLine() {
         io.println("Line!");
-        assertTrue(os.toString().contains("Line!\n"));
+        assertTrue(os.toString().contains("Line!" + newline));
     }
 
     @Test
     void promptPrintsThePrompt() {
-        in.appendString("Input\n");
+        in.appendString("Input" + newline);
         String line = io.prompt("Prompt: ");
         assertTrue(os.toString().contains("Prompt: "));
-        assertFalse(os.toString().contains("Prompt: \n"));
+        assertFalse(os.toString().contains("Prompt: " + newline));
         assertEquals("Input", line);
     }
 
     @Test
     void promptWithDefaultValuePrintsTheDefaultValue() {
-        in.appendString("Input\n");
+        in.appendString("Input" + newline);
         io.prompt("Prompt: ", "Default");
         assertTrue(os.toString().contains("Prompt: "));
         assertTrue(os.toString().contains("Default"));
-        assertFalse(os.toString().contains("Prompt: \n"));
+        assertFalse(os.toString().contains("Prompt: " + newline));
     }
 
     @Test
     void promptWithDefaultValueReturnsTheDefaultValueOnEnter() {
-        in.appendString("\n");
+        in.appendString("" + newline);
         String line = io.prompt("Prompt: ", "Default");
         assertTrue(os.toString().contains("Prompt: "));
         assertTrue(os.toString().contains("Default"));
-        assertFalse(os.toString().contains("Prompt: \n"));
+        assertFalse(os.toString().contains("Prompt: " + newline));
         assertEquals(line, "Default");
     }
 
     @Test
     void promptWithDefaultValueCanBeEdited() {
-        in.appendString("\u0008\u000842\n"); // \u0008 represents backspace
+        in.appendString("\u0008\u000842" + newline); // \u0008 represents backspace
         String line = io.prompt("Prompt: ", "Item 12");
         assertTrue(os.toString().contains("Prompt: "));
         assertTrue(os.toString().contains("Item 12"));
-        assertFalse(os.toString().contains("Prompt: \n"));
+        assertFalse(os.toString().contains("Prompt: " + newline));
         assertEquals(line, "Item 42");
     }
 
     @Test
     void nextStringReturnsTheNextLine() {
-        in.appendString("Line\nAnother\n");
+        in.appendString("Line" + newline + "Another" + newline);
         assertEquals("Line", io.nextString());
     }
 }

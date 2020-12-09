@@ -9,6 +9,7 @@ import ohtu.domain.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Optional;
@@ -108,6 +109,17 @@ public class TextUI {
         void call() throws InterruptedException;
     }
 
+    private void showTagEditor(Set<String> tags) throws InterruptedException {
+        TagEditor editor = new TagEditor(io, tags);
+
+        if (!io.hasUtf8Support()) {
+          editor.setStyle(TagEditor.simpleStyle);
+        }
+
+        editor.setIndent(4);
+        editor.run();
+    }
+
     private void wrapWithCommonFieldPrompts(Suggestion suggestion, InterruptableCallback cb) throws InterruptedException {
         io.println("Fill in:");
         String title = io.prompt("  Title: ");
@@ -119,9 +131,7 @@ public class TextUI {
 
         io.println("  Tags: ([A]dd, [R]emove, [C]ontinue, arrow keys navigate)");
         HashSet<String> tags = new HashSet<>();
-        TagEditor editor = new TagEditor(io, tags);
-        editor.setIndent(4);
-        editor.run();
+        showTagEditor(tags);
         suggestion.setTags(tags);
     }
 
@@ -291,11 +301,7 @@ public class TextUI {
 
             try {
                 HashSet<String> set = new HashSet<>(field.getValue());
-
-                TagEditor editor = new TagEditor(io, set);
-                editor.setIndent(4);
-                editor.run();
-
+                showTagEditor(set);
                 field.setValue(new ArrayList<>(set));
             } catch (InterruptedException ie) {
                 interrupt = Optional.of(ie);
