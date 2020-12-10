@@ -199,11 +199,11 @@ public class TextUI {
     private void commandShow() throws InterruptedException, URISyntaxException, IOException {
         printSuggestionList();
         io.println();
-        io.println("Sort the items by (n)ame, filter by (t)ag, (q)uit or (o)pen link");
+        io.println("Sort the items by (n)ame, (s)earch, filter by (t)ag, (q)uit or (o)pen link");
 
         char input = 0;
 
-        while ("qnto".indexOf(input) == -1) {
+        while ("sqnto".indexOf(input) == -1) {
             input = Character.toLowerCase(io.nextChar());
         }
 
@@ -222,9 +222,18 @@ public class TextUI {
             String tag = io.prompt("Filter by tag: ");
 
             dao.getSuggestions()
-                .stream()
-                .filter(suggestion -> suggestion.getTags().contains(tag))
-                .forEach(this::printSuggestionListItem);
+                    .stream()
+                    .filter(suggestion -> suggestion.getTags().contains(tag))
+                    .forEach(this::printSuggestionListItem);
+        }
+
+        if (input == 's') {
+            String searchterm = io.prompt("Search a suggestion by its name: ");
+
+            dao.getSuggestions()
+                    .stream()
+                    .filter(suggestion -> suggestion.getTitle().contains(searchterm))
+                    .forEach(this::printSuggestionListItem);
         }
 
         if (input == 'o') {
