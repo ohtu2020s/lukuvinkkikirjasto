@@ -66,13 +66,7 @@ public class ConsoleIO implements IO {
     }
 
     public void print(String m) {
-        System.out.println("Printing: " +m);
         terminal.writer().print(m);
-        terminal.writer().flush();
-    }
-
-    public void println(String m) {
-        terminal.writer().println(m);
         terminal.writer().flush();
     }
 

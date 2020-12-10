@@ -16,7 +16,7 @@ public class BookSuggestion extends Suggestion {
 
   @Override
   public String toString() {
-    return String.join(", ", super.getTitle(), getKind().toLowerCase(), super.getAuthor(), super.getComment());
+    return String.join(", ", super.getTitle(), getKind().toLowerCase(), super.getAuthor(), super.getComment(), super.getStatus());
   }
 
   /**

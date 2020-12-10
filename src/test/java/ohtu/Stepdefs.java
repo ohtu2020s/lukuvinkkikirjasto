@@ -120,6 +120,11 @@ public class Stepdefs {
         io.trigger("Comment:", input);
     }
 
+    @When("user inputs a new status {string}")
+    public void userInputsANewStatus(String input) {
+        io.trigger("Status:", input);
+    }
+
     @When("user leaves the title unmodified")
     public void userLeavesTheTitleUnmodified() {
         io.trigger("Title:", null);
@@ -144,6 +149,11 @@ public class Stepdefs {
         io.trigger("Comment:", null);
     }
 
+    @When("user leaves the status unmodified")
+    public void userLeavesTheStatusUnmodified() {
+        io.trigger("Status:", null);
+    }
+
     @Then("system will respond with line {string}")
     public void systemWillRespondWith(String expectedOutput) {
         assertTrue(io.runUntil(expectedOutput::equals));
@@ -159,13 +169,12 @@ public class Stepdefs {
         assertTrue(io.runUntil(line -> line.equals("> ")));
     }
 
-    @Then("suggestion can be found from database with title {string}, author {string}, isbn {string} and comment {string}")
-    public void suggestionIsSavedToDatabase(String title, String author, String isbn, String comment) {
+    @Then("suggestion can be found from database with title {string}, author {string}, isbn {string}, comment {string} and status {string}")
+    public void suggestionIsSavedToDatabase(String title, String author, String isbn, String comment, String status) {
         systemWillShowTheCommandPrompt();
         fieldOfSuggestionHasValueOf("title", 0, title);
         fieldOfSuggestionHasValueOf("author", 0, author);
         fieldOfSuggestionHasValueOf("isbn", 0, isbn);
-        fieldOfSuggestionHasValueOf("comment", 0, comment);
     }
 
     @Then("field {string} of suggestion {int} has value of {string}")

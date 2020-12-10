@@ -125,9 +125,11 @@ public class TextUI {
         String title = io.prompt("  Title: ");
         String author = io.prompt("  Author: ");
         String comment = io.prompt("  Comment: ");
+        String status = io.prompt("  Status: ");
         suggestion.setAuthor(author);
         suggestion.setTitle(title);
         suggestion.setComment(comment);
+        suggestion.setComment(status);
 
         cb.call();
 

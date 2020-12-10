@@ -28,12 +28,21 @@ public abstract class Suggestion {
 
   /**
    * Comment of the suggestion.
-   * 
+   *
    * @see #setComment
    * @see #getComment
    */
   @SuggestionField
   private String comment;
+
+  /**
+   * Status of the suggestion - completed, in progress eg.
+   *
+   * @see #setStatus
+   * @see #getStatus
+   */
+  @SuggestionField
+  private String status;
 
   /**
    * Title or name of the suggested content.
@@ -154,13 +163,23 @@ public abstract class Suggestion {
   public void setId(int id) {
     this.identifier = id;
   }
-  
+
+
   public void setComment(String comment) {
-      this.comment = comment;
+    this.comment = comment;
   }
-  
+
   public String getComment() {
-      return this.comment;
+    return this.comment;
+  }
+
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  public String getStatus() {
+    return this.status;
   }
 
   /**

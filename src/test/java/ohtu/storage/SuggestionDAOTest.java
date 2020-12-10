@@ -21,6 +21,7 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
         sugg.setIsbn("9780316920049");
         sugg.setUrl("URL..//123");
         sugg.setComment("recommended by friend");
+        sugg.setStatus("completed");
         sugg.addTag("tag1");
         sugg.addTag("tag2");
         return sugg;
@@ -163,6 +164,7 @@ public abstract class SuggestionDAOTest<T extends SuggestionDao> {
         suggToStay.setIsbn("New Isbn");
         suggToStay.setUrl("New URL");
         suggToStay.setComment("New Comment");
+        suggToStay.setComment("New Status");
         dao.saveSuggestion(suggToStay);
         
         dao.deleteSuggestion(suggToBeDeleted);

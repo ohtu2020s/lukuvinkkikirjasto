@@ -16,6 +16,7 @@ Feature: käyttäjä voi muokata olemassaolevaa vinkkiä
         And   user inputs a new title "new title"
         And   user inputs a new author "new author"
         And   user inputs a new comment "new comment"
+        And   user inputs a new status "new status"
         And   user inputs a new url "new url"
         And   user inputs character "C" to continue
         Then  system will show the command prompt
@@ -32,6 +33,7 @@ Feature: käyttäjä voi muokata olemassaolevaa vinkkiä
         And   user leaves the title unmodified
         And   user leaves the author unmodified
         And   user leaves the comment unmodified
+        And   user leaves the status unmodified
         And   user leaves the url unmodified
         And   user inputs character "C" to continue
         Then  system will show the command prompt
