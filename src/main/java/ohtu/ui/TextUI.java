@@ -140,7 +140,7 @@ public class TextUI {
     }
 
     private void commandNew() throws InterruptedException {
-        String input = io.prompt("Select suggestion type ('book', 'podcast' or 'article'): ");
+        String input = io.prompt("Select suggestion type ('book', 'podcast', 'article', 'blog' or 'video'): ");
 
         if (input.equalsIgnoreCase("book")) {
             BookSuggestion suggestion = new BookSuggestion();
@@ -164,6 +164,24 @@ public class TextUI {
             dao.saveSuggestion(suggestion);
         } else if (input.equalsIgnoreCase("Article")) {
             ArticleSuggestion suggestion = new ArticleSuggestion();
+
+            wrapWithCommonFieldPrompts(suggestion, () -> {
+                String linkUrl = io.prompt("  URL: ");
+                suggestion.setUrl(linkUrl);
+            });
+
+            dao.saveSuggestion(suggestion);
+        } else if (input.equalsIgnoreCase("Blog")) {
+            BlogSuggestion suggestion = new BlogSuggestion();
+
+            wrapWithCommonFieldPrompts(suggestion, () -> {
+                String linkUrl = io.prompt("  URL: ");
+                suggestion.setUrl(linkUrl);
+            });
+
+            dao.saveSuggestion(suggestion);
+        } else if (input.equalsIgnoreCase("Video")) {
+            VideoSuggestion suggestion = new VideoSuggestion();
 
             wrapWithCommonFieldPrompts(suggestion, () -> {
                 String linkUrl = io.prompt("  URL: ");
